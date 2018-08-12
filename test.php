@@ -11,7 +11,7 @@
 		die( '接続に失敗しました。' );
 	};
 
-	$query = "SELECT * FROM users WHERE name LIKE '%e%' ";
+	$query = "SELECT * FROM table名 WHERE カラム名 LIKE '%e%' ";
 		if( $result = mysqli_query( $link, $query ) ){
 			echo 'クエリの発行に成功しました。<br>';
 		};
