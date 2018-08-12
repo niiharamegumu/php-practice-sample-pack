@@ -17,6 +17,7 @@
 		};
 
 	while( $row = mysqli_fetch_array( $result ) ){
+		//指定した変数に関する情報を解りやすく出力する
 		print_r( $row );
 	};
 
