@@ -10,8 +10,8 @@
 		$weatherArray = json_decode($urlContents, true);
 		$weatherArrayIcon = '<img src="http://openweathermap.org/img/w/' . $weatherArray['weather'][0]['icon'] . '.png">';
 
-		$weather = "The weather in " . $_GET[ 'city' ] . " is " . $weatherArrayIcon . $weatherArray['weather'][0]['main'] .
-								" , " . $weatherArray['weather'][0]['description'];
+		$weather = "The weather in " . $_GET[ 'city' ] . " is<br>" . $weatherArrayIcon . $weatherArray['weather'][0]['main'] .
+								" ,<br>" . $weatherArray['weather'][0]['description'];
 ?>
 
 
