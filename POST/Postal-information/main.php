@@ -31,7 +31,7 @@ fclose( $fp );
     <?php foreach ($data as $value): ?>
       <?php
         preg_match('/[0-9]{3}/', $value[2],$pre);
-        preg_match('/[0-9]{3}$/', $value[2],$after);
+        preg_match('/[0-9]{4}$/', $value[2],$after);
         $html = '';
         $html .= '<tr>';
         $html .= '<td>' . $pre[0] . '-' . $after[0] . '</td>';
