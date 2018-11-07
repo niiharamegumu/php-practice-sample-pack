@@ -54,13 +54,13 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 <head>
     <meta charset="UTF-8">
     <title>ファイル操作</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <h1>ひとこと掲示板</h1>
 
   <?php if ( count($errors) > 0 ) : ?>
-    <ul>
+    <ul class="error">
       <?php foreach ( $errors as $error ) : ?>
         <li><?php echo $error; ?></li>
       <?php endforeach; ?>
@@ -69,15 +69,15 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
   <form method="post" action="normal-version.php">
     <label for="name">名前：</label>
-    <input type="text" name="name" id="name" value="">
+    <input type="text" name="name" id="name"><br>
     <label for="comment">コメント：</label>
-    <input type="text" name="comment" id="comment" value="">
-    <input type="submit" name="submit" value="送信">
+    <input type="text" name="comment" id="comment" class="comment"><br>
+    <input type="submit" name="submit" value="書き込み">
   </form>
 
-  <ul>
+  <ul class="content">
     <?php foreach ( $data as $value ) : ?>
-      <li><?php echo $value; ?></li>
+      <li>● <?php echo $value; ?></li>
     <?php endforeach; ?>
   </ul>
 

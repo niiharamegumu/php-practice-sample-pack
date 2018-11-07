@@ -1,0 +1,46 @@
+@charset "UTF-8";
+body {
+  background-color: #2f5b42;
+  margin: 0;
+}
+h1,
+form,
+ul {
+  text-align: center;
+}
+h1 {
+  border-bottom: 1px dotted #eee;
+  color: #eee;
+  margin: 0 0 20px 0;
+}
+ul {
+  list-style: none;
+  margin: 0 auto;
+  padding-left: 0;
+  width: 840px;
+}
+.error {
+  color: #f50;
+  margin-bottom: 10px;
+}
+form {
+  color: #eee;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+form .comment {
+  width: 400px;
+}
+form input[type="submit"] {
+  background-color: #f50;
+  border-radius: 16%;
+  color: #eee;
+  font-size: 16px;
+  margin-top: 10px;
+  padding: 6px;
+  text-align: center;
+  width: 75px;
+}
+.content {
+  background-color: #eee;
+}
