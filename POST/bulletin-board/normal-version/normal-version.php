@@ -1,47 +1,52 @@
 <?php
-$name = '';
-$comment = '';
-$writeContent = '';
+$filename = './user_data.txt';
+$errors = array();
 $data = array();
-$name_strlen = 0;
-$comment_strlen = 0;
 $name_max = 20;
 $comment_max = 100;
-$fileName = './user_data.txt';
-$log = '[' . date( 'Y-m-d H:i:s' ) . ']' .  "\n";
-
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-  $name = htmlspecialchars( $_POST['name'], ENT_QUOTES, 'UTF-8' );
-  $comment = htmlspecialchars( $_POST['comment'], ENT_QUOTES, 'UTF-8' );
-  $name_strlen = mb_strlen($name);
-  $comment_strlen = mb_strlen($comment);
-  if( mb_strlen($name) <= $name_max && mb_strlen($name) !== 0 &&
-      mb_strlen($comment) <= $comment_max && mb_strlen($comment) !== 0){
+  $name = null;
+  $comment = null;
+  if ( !isset($_POST['name']) || mb_strlen($_POST['name']) === 0 ) {
+    $errors['name_error'] = '名前を入力してください';
+  } elseif ( mb_strlen($_POST['name']) > $name_max ) {
+    $errors['name_error'] = '名前は20文字以内で入力してください';
+  } else {
+    $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
+  }
 
-    if ( $fp = fopen( $fileName, 'a' ) ) {
-      $writeContent = $name . '：' . $comment . $log;
-      if ( !fwrite( $fp, $writeContent ) ) {
-        echo '書き込みに失敗';
-      }
-      fclose( $fp );
+  if ( !isset($_POST['comment']) || mb_strlen($_POST['comment']) === 0 ) {
+    $errors['comment_error'] = 'コメントを入力してください';
+  } elseif ( mb_strlen($_POST['comment']) > $comment_max ) {
+    $errors['comment_error'] = 'コメントは100文字以内で入力してください';
+  } else {
+    $comment = htmlspecialchars($_POST['comment'], ENT_QUOTES, 'UTF-8');
+  }
+
+  if ( count($errors) === 0 ) {
+    $write_content = $name . '：' . $comment . ' -' . date('Y-m-d H:i:s') ."\n";
+
+    if ( !$fp = fopen($filename, 'a') ) {
+      exit('ファイルが開けませんでした');
     }
 
+    if ( !fwrite($fp, $write_content) ) {
+      exit('ファイルに書き込めませんでした');
+    }
+    fclose($fp);
+    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
   }
-  $url_add_get_key = "?name_strlen=" . $name_strlen . "&comment_strlen=" . $comment_strlen;
-  header("Location:http://localhost:8888/php-practice-sample-pack/POST/bulletin-board/normal-version/normal-version.php" . $url_add_get_key);
-  exit();
 }
 
 
-if ( $fp = fopen( $fileName, 'r' ) ) {
-  while ( $tmp = fgets( $fp ) ) {
-    $data[] = htmlspecialchars( $tmp, ENT_QUOTES, 'UTF-8' );
+  if ( $fp = fopen($filename, 'r') ) {
+    while ( $tmp = fgets($fp) ) {
+      $data[] = htmlspecialchars($tmp, ENT_QUOTES, 'UTF-8');
+    }
+    fclose($fp);
+    $data = array_reverse($data);
   }
-  fclose( $fp );
-} else {
-  echo ' 読み込みに失敗 ';
-}
 ?>
 
 <!DOCTYPE html>
@@ -53,50 +58,28 @@ if ( $fp = fopen( $fileName, 'r' ) ) {
 </head>
 <body>
   <h1>ひとこと掲示板</h1>
+
+  <?php if ( count($errors) > 0 ) : ?>
     <ul>
-      <?php
-        if( $_GET['name_strlen'] > $name_max ){
-          echo '<li>名前は20文字以内です。</li>';
-        }
-        if ( $_GET['name_strlen'] === '0' ) {
-          echo '<li>名前を入力してください。</li>';
-        }
-        if ( $_GET['comment_strlen'] > $comment_max  ) {
-          echo '<li>コメントは100文字以内です。</li>';
-        }
-        if ( $_GET['comment_strlen'] === '0' ) {
-          echo '<li>コメントを入力してください。</li>';
-        }
-        $flag = FALSE;
-      ?>
+      <?php foreach ( $errors as $error ) : ?>
+        <li><?php echo $error; ?></li>
+      <?php endforeach; ?>
     </ul>
-  <form method="post">
-    <table>
-      <tr>
-        <th><label for="name">名前：</label></th>
-        <td><input type="text" name="name" id="name" value=""></td>
-      </tr>
-      <tr>
-        <th><label for="comment">コメント：</label></th>
-        <td><input type="text" name="comment" id="comment" value=""></td>
-      </tr>
-    </table>
+  <?php endif; ?>
+
+  <form method="post" action="normal-version.php">
+    <label for="name">名前：</label>
+    <input type="text" name="name" id="name" value="">
+    <label for="comment">コメント：</label>
+    <input type="text" name="comment" id="comment" value="">
     <input type="submit" name="submit" value="送信">
   </form>
 
-    <div>
-      <ul>
-        <?php
-          $html = '';
-          foreach ( $data as $value ) {
-            $html .= '<li>';
-            $html .= $value;
-            $html .= '</li>';
-            echo $html;
-            $html = '';
-          }
-        ?>
-      </ul>
-    </div>
+  <ul>
+    <?php foreach ( $data as $value ) : ?>
+      <li><?php echo $value; ?></li>
+    <?php endforeach; ?>
+  </ul>
+
 </body>
 </html>
