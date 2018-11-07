@@ -29,7 +29,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
   }
   $url_add_get_key = "?name_strlen=" . $name_strlen . "&comment_strlen=" . $comment_strlen;
-  header("Location:http://localhost:8888/code-camp/main.php" . $url_add_get_key);
+  header("Location:http://localhost:8888/php-practice-sample-pack/POST/bulletin-board/normal-version/normal-version.php" . $url_add_get_key);
   exit();
 }
 
