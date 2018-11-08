@@ -4,10 +4,10 @@ $emp = '';
 if ( isset($_GET['emp']) ) {
   $emp = $_GET['emp'];
 }
-$host = 'localhost';
-$username = 'root';
-$passwd = 'root';
-$dbname = 'code_camp';
+$host = '';
+$username = '';
+$passwd = '';
+$dbname = '';
 $link = mysqli_connect( $host, $username, $passwd, $dbname );
 
 if ( $link ) {
