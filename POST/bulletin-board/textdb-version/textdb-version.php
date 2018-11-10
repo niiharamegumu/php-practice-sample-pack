@@ -67,7 +67,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     </ul>
   <?php endif; ?>
 
-  <form method="post" action="normal-version.php">
+  <form method="post" action="textdb-version.php">
     <label for="name">名前：</label>
     <input type="text" name="name" id="name"><br>
     <label for="comment">コメント：</label>

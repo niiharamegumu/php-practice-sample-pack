@@ -41,9 +41,9 @@ if ( $link ) {
                         VALUES (" . $name . "," . $comment . "," . $date . ")";
 
       mysqli_query( $link, $query_insert );
+      header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+      exit;
     }
-    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-    exit;
   }
   $result = mysqli_query( $link, $query_select );
   while ( $row = mysqli_fetch_array($result)) {
@@ -76,7 +76,7 @@ if ( $link ) {
     </ul>
   <?php endif; ?>
 
-  <form method="post" action="normal-version.php">
+  <form method="post" action="phpMyAdmin-version.php">
     <label for="name">名前：</label>
     <input type="text" name="name" id="name"><br>
     <label for="comment">コメント：</label>
