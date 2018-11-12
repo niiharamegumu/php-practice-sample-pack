@@ -12,10 +12,10 @@ $errors = array();
 $query_result_data = array();
 
 
-$host = 'localhost';
-$userName = 'root';
-$userPw = 'root';
-$dbName = 'code_camp';
+$host = '';
+$userName = '';
+$userPw = '';
+$dbName = '';
 $link = mysqli_connect( $host, $userName, $userPw, $dbName );
 if ( $link ) {
   mysqli_set_charset( $link, 'utf8' );
