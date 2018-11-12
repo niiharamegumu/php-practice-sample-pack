@@ -12,10 +12,10 @@ $errors = array();
 $query_result_data = array();
 
 
-$host = '';
-$userName = '';
-$userPw = '';
-$dbName = '';
+$host = 'localhost';
+$userName = 'root';
+$userPw = 'root';
+$dbName = 'code_camp';
 $link = mysqli_connect( $host, $userName, $userPw, $dbName );
 if ( $link ) {
   mysqli_set_charset( $link, 'utf8' );
@@ -44,7 +44,7 @@ if ( $link ) {
       if ( !isset($_GET['pref']) || $_GET['pref'] === '' || mb_strlen($_GET['city']) === 0 ) {
         $errors['error_pref'] = '都道府県を選択後、市区町村を記入ください';
       } elseif ( preg_match( "/[ｦ-ﾟァ-ヴぁ-ん]+/", $_GET['city'] ) !== 1 ) {
-        $errors['error_pref'] = '半角ｶﾀｶﾅでお願いします';
+        $errors['error_pref'] = '全角カタカナ・ひらがな/半角ｶﾀｶﾅでお願いします。';
       } else {
         $pref = htmlspecialchars($_GET['pref'], ENT_QUOTES, 'UTF-8');
         $city = htmlspecialchars($_GET['city'], ENT_QUOTES, 'UTF-8');
