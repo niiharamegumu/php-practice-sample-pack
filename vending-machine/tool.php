@@ -1,6 +1,8 @@
 <?php
 // DB connect.
 $err_msg = array();
+$drink_data_list = array();
+$ext = '';
 $host = 'localhost';
 $user = 'root';
 $pw = 'root';
@@ -27,7 +29,7 @@ if ( $link ) {
     if ( !mysqli_query($link, $sql) ) {
       $err_msg[] = 'drink_info error!';
     }
-    $drink_id = mysqli_insert_id($link);
+    $drink_insert_id = mysqli_insert_id($link);
 
     // File Difinition.
     $temp_file = $_FILES['drink-image']['tmp_name'];
@@ -36,7 +38,7 @@ if ( $link ) {
     // File Upload.
     if (is_uploaded_file($temp_file)) {
       if ( move_uploaded_file($temp_file, $file_name )) {
-        rename($file_name, "./images/" . $drink_id . "." . $ext);
+        rename($file_name, "./images/" . $drink_insert_id . "." . $ext);
       } else {
         $err_msg[] = "ファイルをアップロードできません。";
       }
@@ -45,7 +47,7 @@ if ( $link ) {
     }
 
     // Add drink_id(stock_info),stock-num.
-    $sql = "INSERT INTO stock_info (drink_id, stock_num) VALUES (" . $drink_id . "," . $stock_num . ")";
+    $sql = "INSERT INTO stock_info (drink_id, stock_num) VALUES (" . $drink_insert_id . "," . $stock_num . ")";
     if ( !mysqli_query( $link, $sql ) ) {
       $err_msg[] = 'stock_info error!';
     }
@@ -56,8 +58,21 @@ if ( $link ) {
       mysqli_rollback($link);
     }
 
-    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    // header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
   }
+  $ext = $ext;
+  $sql = "SELECT drink_info.drink_id,drink_info.drink_name, drink_info.drink_price,stock_info.stock_num,drink_info.public_status
+          FROM drink_info
+          JOIN stock_info
+          ON drink_info.drink_id = stock_info.drink_id";
+  if ( $result = mysqli_query( $link, $sql ) ) {
+    while ( $row = mysqli_fetch_array( $result ) ) {
+      $drink_data_list[] = $row;
+    }
+    print_r($drink_data_list);
+  }
+  mysqli_free_result( $result );
+  mysqli_close( $link );
 
 } else {
   $err_msg[] = 'DBに接続できていません。';
@@ -114,8 +129,15 @@ var_dump($err_msg);
           </tr>
         </thead>
         <tbody>
-          <?php  ?>
-          <?php  ?>
+          <?php foreach ( $drink_data_list as $drink_data ) : ?>
+            <tr>
+              <td><img src="<?php echo $drink_data['drink_id'] . "." . $ext ?>"></td>
+              <td><?php echo $drink_data['drink_name'] ?></td>
+              <td><?php echo $drink_data['drink_price'] ?></td>
+              <td><?php echo $drink_data['stock_num'] ?></td>
+              <td><?php echo $drink_data['public_status'] ?></td>
+            </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </section>
