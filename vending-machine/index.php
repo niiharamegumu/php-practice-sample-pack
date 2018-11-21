@@ -15,7 +15,7 @@
     <section class="vending-machine">
       <h2>自動販売機</h2>
 
-      <form method="post">
+      <form method="post" action="result.php">
         <label for="">投入金額</label>：
         <input type="text" name="input-amount"><br>
         <div class="product-list-wrapper">

@@ -1,5 +1,68 @@
 <?php
+// DB connect.
+$err_msg = array();
+$host = 'localhost';
+$user = 'root';
+$pw = 'root';
+$dbName = 'vending_machine';
 
+
+$link = mysqli_connect($host, $user, $pw, $dbName);
+if ( $link ) {
+  mysqli_set_charset($link, 'UTF8');
+  if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+    $drink_name = $_POST['drink-name'];
+    $drink_price = $_POST['drink-price'];
+    $stock_num = $_POST['stock-num'];
+    $status = $_POST['status'];
+    $data = array(
+      'drink_name'  => $drink_name,
+      'drink_price' => $drink_price,
+      'status'      => $status
+    );
+
+    mysqli_autocommit($link, false);
+    //　Add drink-name,drink-price,status.
+    $sql = "INSERT INTO drink_info (drink_name, drink_price, public_status) VALUES('" . implode("','", $data) . "')";
+    if ( !mysqli_query($link, $sql) ) {
+      $err_msg[] = 'drink_info error!';
+    }
+    $drink_id = mysqli_insert_id($link);
+
+    // File Difinition.
+    $temp_file = $_FILES['drink-image']['tmp_name'];
+    $file_name = "./images/" . $_FILES['drink-image']['name'];
+    $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+    // File Upload.
+    if (is_uploaded_file($temp_file)) {
+      if ( move_uploaded_file($temp_file, $file_name )) {
+        rename($file_name, "./images/" . $drink_id . "." . $ext);
+      } else {
+        $err_msg[] = "ファイルをアップロードできません。";
+      }
+    } else {
+      $err_msg[] = "ファイルが選択されていません。";
+    }
+
+    // Add drink_id(stock_info),stock-num.
+    $sql = "INSERT INTO stock_info (drink_id, stock_num) VALUES (" . $drink_id . "," . $stock_num . ")";
+    if ( !mysqli_query( $link, $sql ) ) {
+      $err_msg[] = 'stock_info error!';
+    }
+    // Transaction.
+    if (count($err_msg) === 0) {
+      mysqli_commit($link);
+    } else {
+      mysqli_rollback($link);
+    }
+
+    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+  }
+
+} else {
+  $err_msg[] = 'DBに接続できていません。';
+}
+var_dump($err_msg);
 ?>
 <!DOCTYPE HTML>
 <html lang="ja">
@@ -12,20 +75,27 @@
   <div class="administration-wrapper">
     <h1>管理ページ</h1>
 
-    <section class="addition">
+    <section class="addition" action="tool.php">
       <h2>新規商品の追加</h2>
-      <form method="post">
-        <label for="name">名前</label>：
-        <input type="text" name="name" value="" id="name"><br>
-        <label for="price">値段</label>：
-        <input type="text" name="price" value="" id="price"><br>
-        <label for="add-number">個数</label>：
-        <input type="text" name="add-number" value="" id="add-number"><br>
+      <form method="post" enctype="multipart/form-data" action="tool.php">
+        <label for="drink-name">名前</label>：
+        <input type="text" name="drink-name" value="" id="drink-name"><br>
+
+        <label for="drink-price">値段</label>：
+        <input type="text" name="drink-price" value="" id="drink-price"><br>
+
+        <label for="stock-num">個数</label>：
+        <input type="text" name="stock-num" value="" id="stock-num"><br>
+
+        <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
         <input type="file" name="drink-image"><br>
+
         <select name="status">
           <option value="0">非公開</option>
           <option value="1">公開</option>
         </select><br>
+
+        <input type="hidden" name="submit-type" value="add-item">
         <input type="submit" name="submit-addition" value="商品の追加">
       </form>
     </section>
@@ -49,7 +119,7 @@
         </tbody>
       </table>
     </section>
-    
+
   </div>
 
 </body>
