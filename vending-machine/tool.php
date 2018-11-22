@@ -2,7 +2,6 @@
 // DB connect.
 $err_msg = array();
 $drink_data_list = array();
-$ext = '';
 $host = 'localhost';
 $user = 'root';
 $pw = 'root';
@@ -17,34 +16,38 @@ if ( $link ) {
     $drink_price = $_POST['drink-price'];
     $stock_num = $_POST['stock-num'];
     $status = $_POST['status'];
+    // Image File Upload.
+    $temp_file = $_FILES['drink-image']['tmp_name'];
+    $file_name = "./images/" . $_FILES['drink-image']['name'];
+    $ext = "." . pathinfo($file_name, PATHINFO_EXTENSION);
+    $img_path = md5(uniqid()) . $ext;
+    if (is_uploaded_file($temp_file)) {
+      if ( move_uploaded_file($temp_file, $file_name ) ) {
+        rename($file_name, "./images/" . $img_path);
+      } else {
+        $err_msg[] = "画像アップロード・保存ができませんでした。";
+      }
+    } else {
+      $err_msg[] = "ファイルが選択されていません。";
+    }
+
     $data = array(
       'drink_name'  => $drink_name,
+      'img_path'    => $img_path,
       'drink_price' => $drink_price,
       'status'      => $status
     );
 
     mysqli_autocommit($link, false);
+
+
     //　Add drink-name,drink-price,status.
-    $sql = "INSERT INTO drink_info (drink_name, drink_price, public_status) VALUES('" . implode("','", $data) . "')";
+    $sql = "INSERT INTO drink_info (drink_name, img_path, drink_price, public_status) VALUES('" . implode("','", $data) . "')";
     if ( !mysqli_query($link, $sql) ) {
       $err_msg[] = 'drink_info error!';
     }
     $drink_insert_id = mysqli_insert_id($link);
 
-    // File Difinition.
-    $temp_file = $_FILES['drink-image']['tmp_name'];
-    $file_name = "./images/" . $_FILES['drink-image']['name'];
-    $ext = pathinfo($file_name, PATHINFO_EXTENSION);
-    // File Upload.
-    if (is_uploaded_file($temp_file)) {
-      if ( move_uploaded_file($temp_file, $file_name )) {
-        rename($file_name, "./images/" . $drink_insert_id . "." . $ext);
-      } else {
-        $err_msg[] = "ファイルをアップロードできません。";
-      }
-    } else {
-      $err_msg[] = "ファイルが選択されていません。";
-    }
 
     // Add drink_id(stock_info),stock-num.
     $sql = "INSERT INTO stock_info (drink_id, stock_num) VALUES (" . $drink_insert_id . "," . $stock_num . ")";
@@ -58,10 +61,16 @@ if ( $link ) {
       mysqli_rollback($link);
     }
 
-    // header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
   }
-  $ext = $ext;
-  $sql = "SELECT drink_info.drink_id,drink_info.drink_name, drink_info.drink_price,stock_info.stock_num,drink_info.public_status
+
+
+  $sql = "SELECT drink_info.drink_id,
+                 drink_info.drink_name,
+                 drink_info.img_path,
+                 drink_info.drink_price,
+                 stock_info.stock_num,
+                 drink_info.public_status
           FROM drink_info
           JOIN stock_info
           ON drink_info.drink_id = stock_info.drink_id";
@@ -69,7 +78,6 @@ if ( $link ) {
     while ( $row = mysqli_fetch_array( $result ) ) {
       $drink_data_list[] = $row;
     }
-    print_r($drink_data_list);
   }
   mysqli_free_result( $result );
   mysqli_close( $link );
@@ -131,7 +139,7 @@ var_dump($err_msg);
         <tbody>
           <?php foreach ( $drink_data_list as $drink_data ) : ?>
             <tr>
-              <td><img src="<?php echo $drink_data['drink_id'] . "." . $ext ?>"></td>
+              <td><img src="./images/<?php echo $drink_data['img_path'] ?>"></td>
               <td><?php echo $drink_data['drink_name'] ?></td>
               <td><?php echo $drink_data['drink_price'] ?></td>
               <td><?php echo $drink_data['stock_num'] ?></td>
