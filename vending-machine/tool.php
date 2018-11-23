@@ -1,34 +1,70 @@
 <?php
-// DB connect.
 $err_msg = array();
+$success_msg = array();
 $drink_data_list = array();
+$reverse = 0;
 $host = 'localhost';
 $user = 'root';
 $pw = 'root';
 $dbName = 'vending_machine';
 
 
+// DB connect.
 $link = mysqli_connect($host, $user, $pw, $dbName);
 
 if ( $link ) {
   mysqli_set_charset($link, 'UTF8');
   if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     mysqli_autocommit($link, false);
+
+
     switch ( $_POST['submit-type'] ) {
+
+
       case 'add-item':
-        $drink_name = $_POST['drink-name'];
-        $drink_price = (int)$_POST['drink-price'];
-        $stock_num = (int)$_POST['stock-num'];
-        $status = (int)$_POST['status'];
+        $drink_name = Null;
+        $drink_price = Null;
+        $stock_num = Null;
+        $status = Null;
+
+        if ( !isset( $_POST['drink-name'] ) || mb_strlen( $_POST['drink-name'] ) === 0 ) {
+          $err_msg[] = '名前が空です。';
+        } else {
+          $drink_name = htmlspecialchars($_POST['drink-name'], ENT_QUOTES, 'UTF-8');
+        }
+
+        if ( !isset( $_POST['drink-price'] ) || mb_strlen( $_POST['drink-price'] ) === 0 ) {
+          $err_msg[] = '値段が空です。';
+        } elseif ( !preg_match('/^[0-9]+$/', $_POST['drink-price'] ) ) {
+          $err_msg[] = '値段は、0以上の整数でお願いします。';
+        } else {
+          $drink_price = htmlspecialchars($_POST['drink-price'], ENT_QUOTES, 'UTF-8');
+        }
+
+        if ( !isset( $_POST['stock-num'] ) || mb_strlen( $_POST['stock-num'] ) === 0 ) {
+          $err_msg[] = '個数が空です。';
+        } elseif ( !preg_match('/^[0-9]+$/', $_POST['stock-num'] ) ) {
+          $err_msg[] = '個数は、0以上の整数でお願いします。';
+        } else {
+          $stock_num = htmlspecialchars($_POST['stock-num'], ENT_QUOTES, 'UTF-8');
+        }
+
+        if ( !preg_match( '/^[01]$/', $_POST['status'] ) ) {
+          $err_msg[] = 'ステータスは 0 or 1　の整数でお願いします。';
+        } else {
+          $status = htmlspecialchars($_POST['status'], ENT_QUOTES, 'UTF-8');
+        }
 
         // Image File Upload.
         $temp_file = $_FILES['drink-image']['tmp_name'];
-        $file_name = "./images/" . $_FILES['drink-image']['name'];
-        $ext = "." . pathinfo($file_name, PATHINFO_EXTENSION);
-        $img_path = md5(uniqid()) . $ext;
 
         if (is_uploaded_file($temp_file)) {
-          if ( move_uploaded_file($temp_file, $file_name ) ) {
+          $file_name = "./images/" . $_FILES['drink-image']['name'];
+          $ext = "." . pathinfo($file_name, PATHINFO_EXTENSION);
+          $img_path = md5(uniqid()) . $ext;
+          if ( !preg_match( '/\.png$|\.jpg$|\.jpeg$/i', $ext ) ) {
+            $err_msg[] = '画像の拡張子は、.jpg or .png でお願いします。';
+          } elseif ( move_uploaded_file($temp_file, $file_name ) ) {
             rename($file_name, "./images/" . $img_path);
           } else {
             $err_msg[] = "画像アップロード・保存ができませんでした。";
@@ -37,49 +73,85 @@ if ( $link ) {
           $err_msg[] = "ファイルが選択されていません。";
         }
 
-        $data = array(
-          'drink_name'  => $drink_name,
-          'img_path'    => $img_path,
-          'drink_price' => $drink_price,
-          'status'      => $status
-        );
+        if ( count( $err_msg ) === 0 ) {
+          $data = array(
+            'drink_name'  => $drink_name,
+            'img_path'    => $img_path,
+            'drink_price' => $drink_price,
+            'status'      => $status
+          );
 
-        //　Add drink-name,drink-price,status.
-        $sql = "INSERT INTO drink_info (drink_name, img_path, drink_price, public_status)
-                VALUES('" . implode("','", $data) . "')";
-        if ( !mysqli_query($link, $sql) ) {
-          $err_msg[] = 'drink_info error!';
-        }
-        $drink_insert_id = mysqli_insert_id($link);
+          //　Add drink-name,drink-price,status.
+          $sql = "INSERT INTO drink_info (drink_name, img_path, drink_price, public_status)
+                  VALUES('" . implode("','", $data) . "')";
+          if ( !mysqli_query($link, $sql) ) {
+            $err_msg[] = 'drink_info error!';
+          }
+          $drink_insert_id = mysqli_insert_id($link);
 
-        // Add drink_id(stock_info),stock-num.
-        $sql = "INSERT INTO stock_info (drink_id, stock_num)
-                VALUES (" . $drink_insert_id . "," . $stock_num . ")";
-        if ( !mysqli_query( $link, $sql ) ) {
-          $err_msg[] = 'stock_info error!';
+          // Add drink_id(stock_info),stock-num.
+          $sql = "INSERT INTO stock_info (drink_id, stock_num)
+                  VALUES (" . $drink_insert_id . "," . $stock_num . ")";
+          if ( !mysqli_query( $link, $sql ) ) {
+            $err_msg[] = 'stock_info error!';
+          }
         }
+
+        // if ( count($err_msg) === 0 ) {
+        //   $success_msg[] = 'ドリンクを追加しました';
+        // }
         break;
+
 
       case 'stock-update':
         $drink_id = (int)$_POST['drink-id'];
-        $stock_update_num = (int)$_POST['stock-update-num'];
 
-        $sql = "UPDATE stock_info
-                SET stock_num = " . $stock_update_num .  " WHERE drink_id = " . $drink_id;
-        if ( !mysqli_query( $link, $sql ) ) {
-          $err_msg[] = "在庫数のアップデートに失敗しました。";
+        if ( !isset( $_POST['stock-update-num'] ) || mb_strlen( $_POST['stock-update-num'] ) === 0 ) {
+          $err_msg[] = '在庫数が空です。';
+        } elseif ( !preg_match('/^[0-9]+$/', $_POST['stock-update-num'] ) ) {
+          $err_msg[] = '在庫数は、0以上の整数でお願いします。';
+        } else {
+          $stock_update_num = htmlspecialchars($_POST['stock-update-num'], ENT_QUOTES, 'UTF-8');
         }
+
+        if ( count( $err_msg )  === 0 ) {
+          $sql = "UPDATE stock_info
+          SET stock_num = " . $stock_update_num .  " WHERE drink_id = " . $drink_id;
+          if ( !mysqli_query( $link, $sql ) ) {
+            $err_msg[] = "在庫数のアップデートに失敗しました。";
+          }
+        }
+
+        // if ( count($err_msg) === 0 ) {
+        //   $success_msg[] = '在庫数を変更しました';
+        // }
         break;
 
-    }
 
+      case 'change-status':
+        $drink_id = (int)$_POST['drink-id'];
+        $reverse_status = (int)$_POST['reverse-status'];
+
+        $sql = "UPDATE drink_info
+                SET public_status = " . $reverse_status .  " WHERE drink_id = " . $drink_id;
+        if ( !mysqli_query( $link, $sql ) ) {
+          $err_msg[] = "ステータスの変更ができませんでした。";
+        }
+
+        // if ( count($err_msg) === 0 ) {
+        //   $success_msg[] = 'ステータスを変更しました';
+        // }
+        break;
+    }
     // Transaction.
     if (count($err_msg) === 0) {
       mysqli_commit($link);
+      header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+      exit;
     } else {
       mysqli_rollback($link);
     }
-    // header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+
   }
 
 
@@ -104,7 +176,7 @@ if ( $link ) {
 } else {
   $err_msg[] = 'DBに接続できていません。';
 }
-var_dump($err_msg);
+// var_dump($err_msg);
 ?>
 <!DOCTYPE HTML>
 <html lang="ja">
@@ -117,6 +189,13 @@ var_dump($err_msg);
 
   <div class="administration-wrapper">
     <h1>管理ページ</h1>
+    <?php if ( count($err_msg) > 0 ) : ?>
+      <ul>
+        <?php foreach ( $err_msg as $err ) : ?>
+          <li><?php echo $err; ?></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
 
     <section class="addition" action="tool.php">
       <h2>新規商品の追加</h2>
@@ -147,6 +226,7 @@ var_dump($err_msg);
       <h2>商品情報の変更</h2>
       <table>
         <caption>商品一覧</caption>
+
         <thead>
           <tr>
             <th colspan="col">商品画像</th>
@@ -156,12 +236,14 @@ var_dump($err_msg);
             <th colspan="col">ステータス</th>
           </tr>
         </thead>
+
         <tbody>
           <?php foreach ( $drink_data_list as $drink_data ) : ?>
             <tr>
               <td><img src="./images/<?php echo $drink_data['img_path'] ?>"></td>
               <td><?php echo $drink_data['drink_name'] ?></td>
               <td><?php echo $drink_data['drink_price'] ?></td>
+
               <form method="post" action="tool.php">
                 <td>
                   <input type="text" name="stock-update-num" value="<?php echo $drink_data['stock_num'] ?>">個<br>
@@ -170,10 +252,26 @@ var_dump($err_msg);
                 <input type="hidden" name="drink-id" value="<?php echo $drink_data['drink_id'] ?>">
                 <input type="hidden" name="submit-type" value="stock-update">
               </form>
-              <td><?php echo $drink_data['public_status'] ?></td>
+
+              <form method="post" action="tool.php">
+                <td>
+                  <?php if (  (int)$drink_data['public_status'] === 1 ) : ?>
+                    <input type="submit" value="公開→非公開">
+                    <?php $reverse = 0; ?>
+                  <?php else : ?>
+                    <input type="submit" value="非公開→公開">
+                    <?php $reverse = 1; ?>
+                  <?php endif; ?>
+                </td>
+                <input type="hidden" name="reverse-status" value="<?php echo $reverse ?>">
+                <input type="hidden" name="drink-id" value="<?php echo $drink_data['drink_id'] ?>">
+                <input type="hidden" name="submit-type" value="change-status">
+              </form>
+
             </tr>
           <?php endforeach; ?>
         </tbody>
+
       </table>
     </section>
 
