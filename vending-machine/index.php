@@ -2,10 +2,10 @@
 $err_msg = array();
 $public_drink_list = array();
 $public_status = 1;
-$host = 'localhost';
-$user = 'root';
-$pw = 'root';
-$dbName = 'vending_machine';
+$host = '';
+$user = '';
+$pw = '';
+$dbName = '';
 
 
 // DB connect.

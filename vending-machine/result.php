@@ -1,10 +1,10 @@
 <?php
 $err_msg = array();
 $result_data = array();
-$host = 'localhost';
-$user = 'root';
-$pw = 'root';
-$dbName = 'vending_machine';
+$host = '';
+$user = '';
+$pw = '';
+$dbName = '';
 
 
 // DB connect.

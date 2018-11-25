@@ -3,10 +3,10 @@ $err_msg = array();
 $success_msg = array();
 $drink_data_list = array();
 $reverse = 0;
-$host = 'localhost';
-$user = 'root';
-$pw = 'root';
-$dbName = 'vending_machine';
+$host = '';
+$user = '';
+$pw = '';
+$dbName = '';
 
 
 // DB connect.
