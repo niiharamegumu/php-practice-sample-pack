@@ -30,7 +30,7 @@ if ( $link ) {
         if ( !isset( $_POST['drink-name'] ) || mb_strlen( $_POST['drink-name'] ) === 0 ) {
           $err_msg[] = '名前が空です。';
         } else {
-          $drink_name = htmlspecialchars($_POST['drink-name'], ENT_QUOTES, 'UTF-8');
+          $drink_name = $_POST['drink-name'];
         }
 
         if ( !isset( $_POST['drink-price'] ) || mb_strlen( $_POST['drink-price'] ) === 0 ) {
@@ -38,7 +38,7 @@ if ( $link ) {
         } elseif ( !preg_match('/^[0-9]+$/', $_POST['drink-price'] ) ) {
           $err_msg[] = '値段は、0以上の整数でお願いします。';
         } else {
-          $drink_price = htmlspecialchars($_POST['drink-price'], ENT_QUOTES, 'UTF-8');
+          $drink_price = $_POST['drink-price'];
         }
 
         if ( !isset( $_POST['stock-num'] ) || mb_strlen( $_POST['stock-num'] ) === 0 ) {
@@ -46,13 +46,13 @@ if ( $link ) {
         } elseif ( !preg_match('/^[0-9]+$/', $_POST['stock-num'] ) ) {
           $err_msg[] = '個数は、0以上の整数でお願いします。';
         } else {
-          $stock_num = htmlspecialchars($_POST['stock-num'], ENT_QUOTES, 'UTF-8');
+          $stock_num = $_POST['stock-num'];
         }
 
         if ( !preg_match( '/^[01]$/', $_POST['status'] ) ) {
           $err_msg[] = 'ステータスは 0 or 1　の整数でお願いします。';
         } else {
-          $status = htmlspecialchars($_POST['status'], ENT_QUOTES, 'UTF-8');
+          $status = $_POST['status'];
         }
 
         // Image File Upload.
@@ -111,12 +111,12 @@ if ( $link ) {
         } elseif ( !preg_match('/^[0-9]+$/', $_POST['stock-update-num'] ) ) {
           $err_msg[] = '在庫数は、0以上の整数でお願いします。';
         } else {
-          $stock_update_num = htmlspecialchars($_POST['stock-update-num'], ENT_QUOTES, 'UTF-8');
+          $stock_update_num = $_POST['stock-update-num'];
         }
 
         if ( count( $err_msg )  === 0 ) {
           $sql = "UPDATE stock_info
-          SET stock_num = " . $stock_update_num .  " WHERE drink_id = " . $drink_id;
+                  SET stock_num = " . $stock_update_num .  " WHERE drink_id = " . $drink_id;
           if ( !mysqli_query( $link, $sql ) ) {
             $err_msg[] = "在庫数のアップデートに失敗しました。";
           }
