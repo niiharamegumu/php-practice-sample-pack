@@ -9,7 +9,6 @@ $pw = '';
 $dbName = '';
 
 
-// DB connect.
 $link = mysqli_connect($host, $user, $pw, $dbName);
 
 if ( $link ) {
@@ -55,7 +54,6 @@ if ( $link ) {
           $status = $_POST['status'];
         }
 
-        // Image File Upload.
         $temp_file = $_FILES['drink-image']['tmp_name'];
 
         if (is_uploaded_file($temp_file)) {
@@ -81,7 +79,6 @@ if ( $link ) {
             'status'      => $status
           );
 
-          //　Add drink-name,drink-price,status.
           $sql = "INSERT INTO drink_info (drink_name, img_path, drink_price, public_status)
                   VALUES('" . implode("','", $data) . "')";
           if ( !mysqli_query($link, $sql) ) {
@@ -89,7 +86,6 @@ if ( $link ) {
           }
           $drink_insert_id = mysqli_insert_id($link);
 
-          // Add drink_id(stock_info),stock-num.
           $sql = "INSERT INTO stock_info (drink_id, stock_num)
                   VALUES (" . $drink_insert_id . "," . $stock_num . ")";
           if ( !mysqli_query( $link, $sql ) ) {
@@ -143,7 +139,7 @@ if ( $link ) {
         // }
         break;
     }
-    // Transaction.
+
     if (count($err_msg) === 0) {
       mysqli_commit($link);
       header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
@@ -176,7 +172,6 @@ if ( $link ) {
 } else {
   $err_msg[] = 'DBに接続できていません。';
 }
-// var_dump($err_msg);
 ?>
 <!DOCTYPE HTML>
 <html lang="ja">

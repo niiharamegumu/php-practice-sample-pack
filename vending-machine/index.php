@@ -1,4 +1,5 @@
 <?php
+
 $err_msg = array();
 $public_drink_list = array();
 $public_status = 1;
@@ -8,7 +9,6 @@ $pw = '';
 $dbName = '';
 
 
-// DB connect.
 $link = mysqli_connect($host, $user, $pw, $dbName);
 
 if ( $link ) {
@@ -35,7 +35,6 @@ if ( $link ) {
   $err_msg[] = 'DBに接続できていません。';
 }
 
-
 ?>
 <!DOCTYPE HTML>
 <html lang="ja">
@@ -52,12 +51,11 @@ if ( $link ) {
       <h2>自動販売機</h2>
 
       <form method="post" action="result.php">
+
         <label for="">投入金額</label>：
         <input type="text" name="input-amount">円 *半角数字<br>
-
         <div class="product-list-wrapper">
           <ul class="drink">
-
             <?php foreach ( $public_drink_list as $public_drink ) : ?>
               <li>
                 <span><img src="./images/<?php echo $public_drink['img_path']; ?>"></span><br>
@@ -70,11 +68,10 @@ if ( $link ) {
                 <?php endif; ?>
               </li>
             <?php endforeach; ?>
-
           </ul>
         </div>
-
         <input type="submit" name="submit-purchase" value="購入">
+
       </form>
 
     </section>
