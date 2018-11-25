@@ -1,4 +1,5 @@
 <?php
+$remaining_amount = 0;
 $err_msg = array();
 $result_data = array();
 $host = '';
@@ -7,14 +8,15 @@ $pw = '';
 $dbName = '';
 
 
-// DB connect.
 $link = mysqli_connect($host, $user, $pw, $dbName);
 
 if ( $link ) {
   mysqli_set_charset($link, 'UTF8');
   $input_amount = 0;
   $stock_num = 0;
+  $drink_price = 0;
   $drink_id = Null;
+  $public_status = Null;
 
   if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     mysqli_autocommit($link, false);
@@ -35,48 +37,86 @@ if ( $link ) {
       $drink_id = (int)$_POST['drink-id'];
     }
 
-    $sql = "SELECT stock_num
-    FROM stock_info
-    WHERE drink_id = " . $drink_id;
-    if ($result = mysqli_query( $link, $sql ) ) {
-      $row = mysqli_fetch_array( $result );
-      $stock_num = (int)$row['stock_num'];
-    } else {
-      $err_msg[] = 'SQLエラー' . $sql;
-    }
 
     if ( count( $err_msg ) === 0 ) {
-      $after_stock_num = $stock_num - 1;
-      $sql = "UPDATE stock_info
-              SET stock_num = " . $after_stock_num .
-              " WHERE drink_id = " . $drink_id;
-      if ( !mysqli_query( $link, $sql ) ) {
-      $err_msg[] = 'SQLエラー' . $sql;
+      $sql = "SELECT d.drink_price,
+                     d.public_status,
+                     s.stock_num
+              FROM drink_info AS d
+              JOIN stock_info AS s
+              ON d.drink_id = s.drink_id
+              WHERE
+                d.drink_id = " . $drink_id .
+              " AND" .
+                " s.drink_id = " . $drink_id;
+
+      if ($result = mysqli_query( $link, $sql ) ) {
+        $row = mysqli_fetch_array( $result );
+        $drink_price = (int)$row['drink_price'];
+
+        if ( (int)$row['stock_num'] === 0 ) {
+          $err_msg[] = '在庫数に変更がありました。在庫がありませんでした。';
+        } else {
+          $stock_num = (int)$row['stock_num'];
+        }
+
+        if ( (int)$row['public_status'] === 0 ) {
+          $err_msg[] = '公開ステータスが変更されていました。非公開の飲み物でした。';
+        }
+
+      } else {
+        $err_msg[] = 'SQLエラー' . $sql;
       }
+
+      if ( $input_amount >= $drink_price ) {
+        $remaining_amount = $input_amount - $drink_price;
+      } else {
+        $err_msg[] = '投入金額が足りません。';
+      }
+
+      if ( count( $err_msg ) === 0 ) {
+        $after_stock_num = $stock_num - 1;
+        $sql = "UPDATE stock_info
+                SET stock_num = " . $after_stock_num .
+                " WHERE drink_id = " . $drink_id;
+        if ( !mysqli_query( $link, $sql ) ) {
+        $err_msg[] = 'SQLエラー' . $sql;
+        }
+      }
+
+      if ( count( $err_msg ) === 0 ) {
+        $sql = "INSERT INTO purchase_history (drink_id)
+                VALUES (" . $drink_id . ")";
+        if ( !mysqli_query( $link, $sql ) ) {
+          $err_msg[] = 'SQLエラー' . $sql;
+        }
+      }
+
     }
+
     if (count($err_msg) === 0) {
       mysqli_commit($link);
-      // header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-      // exit;
     } else {
       mysqli_rollback($link);
     }
   }
 
-  $sql = "SELECT drink_name,
-                 img_path
-          FROM drink_info
-          WHERE drink_id = " . $drink_id;
+  if ( count( $err_msg ) === 0 ) {
+    $sql = "SELECT drink_name,
+                   img_path
+            FROM drink_info
+            WHERE drink_id = " . $drink_id;
 
-  if ( $result = mysqli_query( $link, $sql ) ) {
-    while ( $row = mysqli_fetch_array( $result ) ) {
-      // $row --> Sanitizing をすること
-      $result_data[] = $row;
+    if ( $result = mysqli_query( $link, $sql ) ) {
+      while ( $row = mysqli_fetch_array( $result ) ) {
+        // $row --> Sanitizing をすること
+        $result_data[] = $row;
+      }
     }
-  }
 
-  mysqli_free_result( $result );
-  mysqli_close( $link );
+    mysqli_free_result( $result );
+    mysqli_close( $link );
+  }
 
 } else {
   $err_msg[] = 'DBに接続できていません。';
@@ -96,9 +136,17 @@ if ( $link ) {
 
     <section class="purchase-result">
       <h2>販売結果</h2>
-      <img src="./images/<?php echo $result_data[0]['img_path']; ?>" alt="ここは画像です">
-      <p>購入ドリンク：<?php echo $result_data[0]['drink_name']; ?></p>
-      <p>おつり：<?php echo $input_amount; ?>円</p>
+      <?php if ( count( $err_msg ) === 0 ) : ?>
+        <img src="./images/<?php echo $result_data[0]['img_path']; ?>" alt="ドリンクイメージ">
+        <p>購入ドリンク：<?php echo $result_data[0]['drink_name']; ?></p>
+        <p>おつり：<?php echo $remaining_amount; ?>円</p>
+      <?php else : ?>
+        <ul>
+          <?php foreach ( $err_msg as $err ): ?>
+              <li><?php echo $err; ?></li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
       <footer><a href="index.php">戻る</a></footer>
     </section>
 
