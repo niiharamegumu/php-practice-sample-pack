@@ -12,7 +12,6 @@ $link = mysqli_connect( $host, $username, $passwd, $dbname );
 
 if ( $link ) {
   mysqli_set_charset( $link, 'utf8' );
-  $query_select = "SELECT board_user_name, board_user_comment, board_user_date FROM one_board";
 
   if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $name = null;
@@ -22,7 +21,7 @@ if ( $link ) {
     } elseif ( mb_strlen($_POST['name']) > $name_max ) {
       $errors['name_error'] = '名前は20文字以内で入力してください';
     } else {
-      $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
+      $name = $_POST['name'];
     }
 
     if ( !isset($_POST['comment']) || mb_strlen($_POST['comment']) === 0 ) {
@@ -30,7 +29,7 @@ if ( $link ) {
     } elseif ( mb_strlen($_POST['comment']) > $comment_max ) {
       $errors['comment_error'] = 'コメントは100文字以内で入力してください';
     } else {
-      $comment = htmlspecialchars($_POST['comment'], ENT_QUOTES, 'UTF-8');
+      $comment = $_POST['comment'];
     }
 
     if ( count($errors) === 0 ) {
@@ -45,6 +44,7 @@ if ( $link ) {
       exit;
     }
   }
+  $query_select = "SELECT board_user_name, board_user_comment, board_user_date FROM one_board";
   $result = mysqli_query( $link, $query_select );
   while ( $row = mysqli_fetch_array($result)) {
     $data[] = $row;
