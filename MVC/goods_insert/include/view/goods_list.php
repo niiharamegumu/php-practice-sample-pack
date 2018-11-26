@@ -29,6 +29,6 @@
       </tr>
     <?php endforeach; ?>
   </table>
-
+  <a href="goods_insert.php">商品追加ページへ</a>
 </body>
 </html>
