@@ -4,28 +4,49 @@ $one_board_data = array();
 define('NAME_MAX', 20);
 define('COMMENT_MAX', 100);
 
-define('DB_HOST',   '');
-define('DB_USER',   '');
-define('DB_PASSWD', '');
-define('DB_NAME',   '');
+define('DB_HOST',   'localhost');
+define('DB_USER',   'root');
+define('DB_PASSWD', 'root');
+define('DB_NAME',   'one_board');
 define('DB_CHARACTER_SET',   'UTF8');
 define('HTML_CHARACTER_SET', 'UTF-8');
 
 
 
-$link = get_db_connect();
+if ( !$link = get_db_connect() ) {
+  $errors[] = 'DBに接続できませんでした。';
+}
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
   $name = Null;
   $comment = Null;
 
-  $name = check_input_value( 'name', NAME_MAX );
-  $comment = check_input_value( 'comment', COMMENT_MAX );
+  $result = check_input_value( 'name', NAME_MAX );
+  if ( $result === 'TRUE' ) {
+    $name = get_post_value( 'name' );
+  } else {
+    $errors[] = $result;
+  }
 
-  set_one_board_list( $link );
+  $result = check_input_value( 'comment', COMMENT_MAX );
+  if ( $result === 'TRUE' ) {
+    $comment = get_post_value( 'comment' );
+  } else {
+    $errors[] = $result;
+  }
+
+  if ( count( $errors ) === 0 ) {
+    if ( !set_one_board_list( $link, $name, $comment ) ) {
+      $errors[] = 'INSERTエラー';
+    }
+  }
+
 }
 
-$one_board_data = get_one_board_list( $link );
+if ( !$one_board_data = get_one_board_list( $link ) ) {
+  $errors[] = 'SELECTエラー';
+}
+
 $one_board_data = entity_assoc_array($one_board_data);
 
 mysqli_close( $link );
@@ -36,37 +57,43 @@ $one_board_data = array_reverse( $one_board_data );
 
 function get_db_connect () {
   if (!$link = mysqli_connect(DB_HOST, DB_USER, DB_PASSWD, DB_NAME)) {
-    $error[] = 'DBの接続に失敗しました。';
+    return FALSE;
   }
   mysqli_set_charset($link, DB_CHARACTER_SET);
   return $link;
 }
 
-function check_input_value ( $type, $max ) {
-  if ( !isset( $_POST[$type] ) || mb_strlen( $_POST[$type] ) === 0 ) {
-    $errors[] = strtoupper($type) . 'を入力してください。';
-  } elseif ( mb_strlen( $_POST[$type] ) > $max ) {
-    $errors[] = strtoupper($type) . 'は' . $max . '文字以内でお願いします。';
-  } else {
-    return $_POST[$type];
+function get_post_value ( $name ) {
+  if( isset( $_POST[$name] ) ) {
+    return trim( $_POST[$name] );
   }
-
 }
 
-function set_one_board_list ( $link ) {
-  if ( count( $error ) === 0 ) {
-    $data = array(
-      'board_user_name'    => $name,
-      'board_user_comment' => $comment
-    );
-    $sql = "INSERT INTO one_board (board_user_name, board_user_comment)
-            VALUES ('" . implode("','", $data) . "')";
-    if (!mysqli_query( $link, $sql ) ) {
-      $errors[] = 'SQLエラー：' . $sql;
-    }
-    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-    exit;
+function check_input_value ( $type, $max ) {
+  $error = '';
+  if ( !isset( $_POST[$type] ) || mb_strlen( $_POST[$type] ) === 0 ) {
+    $error = strtoupper($type) . 'を入力してください。';
+    return $error;
+  } elseif ( mb_strlen( $_POST[$type] ) > $max ) {
+    $error = strtoupper($type) . 'は' . $max . '文字以内でお願いします。';
+    return $error;
+  } else {
+    return 'TRUE';
   }
+}
+
+function set_one_board_list ( $link, $name, $comment ) {
+  $data = array(
+    'board_user_name'    => $name,
+    'board_user_comment' => $comment
+  );
+  $sql = "INSERT INTO one_board_revised_edition (board_user_name, board_user_comment)
+          VALUES ('" . implode("','", $data) . "')";
+  if (!mysqli_query( $link, $sql ) ) {
+    return FALSE;
+  }
+  header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+  exit;
 }
 
 function get_one_board_list ( $link ) {
@@ -74,7 +101,7 @@ function get_one_board_list ( $link ) {
   $sql = "SELECT board_user_name,
                  board_user_comment,
                  board_user_date
-          FROM one_board";
+          FROM one_board_revised_edition";
   if ( $result = mysqli_query( $link, $sql ) ) {
     if (mysqli_num_rows($result) > 0) {
       while ($row = mysqli_fetch_assoc($result)) {
@@ -83,7 +110,7 @@ function get_one_board_list ( $link ) {
     }
     mysqli_free_result($result);
   } else {
-    $errors[] = 'SQLエラー：' . $sql;
+    return FALSE;
   }
   return $data;
 }
@@ -117,7 +144,7 @@ function entity_assoc_array ( $assoc_array ) {
     </ul>
   <?php endif; ?>
 
-  <form method="post" action="phpMyAdmin-version.php">
+  <form method="post" action="phpMyAdmin-func-version.php">
     <label for="name">NAME：</label>
     <input type="text" name="name" id="name"><br>
     <label for="comment">COMMENT：</label>
