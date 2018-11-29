@@ -12,6 +12,8 @@ function get_db_connect () {
 function get_post_value ( $name ) {
   if ( isset( $_POST[$name] ) ) {
     return trim( $_POST[$name] );
+  } else {
+    return FALSE;
   }
 }
 
@@ -68,6 +70,32 @@ function check_extension ( $ext ) {
   }
 }
 
+function entity_str($str) {
+  return htmlspecialchars($str, ENT_QUOTES, HTML_CHARACTER_SET);
+}
+
+function entity_assoc_array($assoc_array) {
+  foreach ($assoc_array as $key => $value) {
+    foreach ($value as $keys => $values) {
+      $assoc_array[$key][$keys] = entity_str($values);
+    }
+}
+  return $assoc_array;
+}
+
+function get_as_array($link, $sql) {
+  $data = array();
+  if ($result = mysqli_query($link, $sql)) {
+    if (mysqli_num_rows($result) > 0) {
+      while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+      }
+    }
+  mysqli_free_result($result);
+  }
+  return $data;
+}
+
 function insert_drink_info ( $link, $drink_name, $img_name, $drink_price, $status ) {
   $data = array(
     'drink_name'    => $drink_name,
@@ -84,6 +112,77 @@ function insert_stock_info ( $link, $drink_id, $stock_num ) {
   $sql = "INSERT INTO stock_info (drink_id, stock_num)
           VALUES (" . $drink_id . "," . $stock_num . ")";
   return insert_db( $link, $sql );
+}
+
+function insert_purchase_history ( $link, $id ) {
+  $sql = "INSERT INTO purchase_history (drink_id)
+          VALUES (" . $id . ")";
+  return insert_db( $link, $sql );
+}
+
+function update_stock_num ( $link, $num, $id ) {
+  $sql = "UPDATE stock_info
+          SET stock_num = " . $num .  " WHERE drink_id = " . $id;
+  return insert_db( $link, $sql );
+}
+
+function update_public_status ( $link, $status, $id ) {
+  $sql = "UPDATE drink_info
+          SET public_status = " . $status .  " WHERE drink_id = " . $id;
+  return insert_db( $link, $sql );
+}
+
+function get_drink_data_list ( $link ) {
+  $sql = "SELECT drink_info.drink_id,
+                 drink_info.drink_name,
+                 drink_info.img_path,
+                 drink_info.drink_price,
+                 stock_info.stock_num,
+                 drink_info.public_status
+          FROM drink_info
+          JOIN stock_info
+          ON drink_info.drink_id = stock_info.drink_id";
+  return get_as_array($link, $sql);
+}
+
+function get_public_status_drink_data ( $link, $status ) {
+  $sql = "SELECT drink_info.drink_id,
+                 drink_info.drink_name,
+                 drink_info.img_path,
+                 drink_info.drink_price,
+                 stock_info.stock_num,
+                 drink_info.public_status
+          FROM drink_info
+          JOIN stock_info
+          ON drink_info.drink_id = stock_info.drink_id
+          WHERE public_status = " . $status;
+  return get_as_array($link, $sql);
+}
+
+function get_buy_drink_check_data ( $link, $id ) {
+  $sql = "SELECT d.drink_price,
+                 d.public_status,
+                 s.stock_num
+          FROM drink_info AS d
+          JOIN stock_info AS s
+          ON d.drink_id = s.drink_id
+          WHERE
+            d.drink_id = " . $id .
+          " AND" .
+            " s.drink_id = " . $id;
+  if ( $result = mysqli_query( $link, $sql ) ) {
+    return $result;
+  } else {
+    return FALSE;
+  }
+}
+
+function get_drink_result_data ( $link, $id ) {
+  $sql = "SELECT drink_name,
+                 img_path
+          FROM drink_info
+          WHERE drink_id = " . $id;
+  return get_as_array( $link, $sql );
 }
 
 function insert_db($link, $sql) {
