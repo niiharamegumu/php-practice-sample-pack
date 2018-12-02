@@ -1,11 +1,12 @@
 <?php
 class Entree {
-  //このクラス外のコードはアクセスできない
+  //private:このクラスからのみアクセスできる。
   private $name;
-  //このクラスのサブクラスのみアクセスできる
+  //protected:このクラス自身、このクラスを継承したクラス、親クラスからのみアクセスできる。
   protected $ingredients = [];
 
   //construct
+  //インスタンス化するときに実行される
   public function __construct ( $name, $ingredients ) {
     if ( !is_array( $ingredients ) ) {
       // 例外の捕捉をすべき
@@ -14,7 +15,8 @@ class Entree {
     $this->name = $name;
     $this->ingredients = $ingredients;
   }
-
+  //public:どこからでもアクセス可。
+  //アクセサ：アクセス権privateの取得手段の提供。
   public function getName () {
     return $this->name;
   }
@@ -22,7 +24,9 @@ class Entree {
   public function hasIngredients ( $ingredients ) {
     return in_array( $ingredients, $this->ingredients );
   }
-  //静的メソッド
+  //静的メソッド(クラスのインスタンス化なしにアクセスできる:static)
+  //疑似変数($this)の使用はできない。
+  //デフォルトでpublic
   public static function getSizes () {
     return array('small','medium','large');
   }
@@ -52,6 +56,7 @@ class ComboMeal extends Entree {
 }
 
 //静的メソッドの呼び出し
+//インスタンス化なしに呼び出せる。
 $size = Entree::getSizes();
 // print_r($size);
 
@@ -76,6 +81,3 @@ foreach ( ['chicken', 'lemon', 'bread', 'water'] as $ing ) {
     echo "Sandwith Contains $ing .\n";
   }
 }
-
-
-?>
