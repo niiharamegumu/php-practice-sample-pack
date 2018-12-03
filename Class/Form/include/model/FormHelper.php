@@ -53,10 +53,10 @@ class FormHelper {
 
   protected function attributes ( $attributes, $isMultiple, $valueAttrivute = true ) {
     $tmp = [];
-    if ( $valueAttrivute && isset($attributes['name'])
-         && array_key_exists($attributes['name'], $this->values) ) {
-      $attributes['value'] = $this->values[$attributes['name']];
-    }
+    // if ( $valueAttrivute && isset($attributes['name'])
+    //      && array_key_exists($attributes['name'], $this->values) ) {
+    //   // $attributes['value'] = $this->values[$attributes['name']];
+    // }
     foreach ( $attributes as $k => $v ) {
       if ( is_bool($v) ) {
         if ( $v ) { $tmp[] = $this->encode($k); }
