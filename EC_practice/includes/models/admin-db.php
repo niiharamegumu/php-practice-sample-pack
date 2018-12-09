@@ -4,7 +4,7 @@ class Admin_Db {
   private $db;
 
   public function __construct() {
-    $this->db = $this->db_connect();;
+    $this->db = $this->db_connect();
     return $this->db;
   }
 
@@ -12,7 +12,7 @@ class Admin_Db {
     try {
       $db = new PDO(DSN, DB_USER, DB_PASSWD);
     } catch ( PDOException $e ) {
-      $e->getMessage();
+      echo $e->getMessage();
       exit;
     }
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -22,8 +22,8 @@ class Admin_Db {
   public function insert_options_item ( $input ) {
     $date = date('Y-m-d H:i:s');
     $db = $this->db;
-    $db->beginTransaction();
     try {
+      $db->beginTransaction();
       $stmt = $db->prepare('INSERT INTO item_info ( item_name, item_price, item_img, public_status, created_date )
                             VALUES (?,?,?,?,?)');
       $args = [
@@ -39,15 +39,15 @@ class Admin_Db {
       return $id;
     } catch ( PDOException $e ) {
       $db->rollBack();
-      $e->getMessage();
+      echo $e->getMessage();
     }
   }
 
   public function insert_option_stock ( $input, $id ) {
     $date = date('Y-m-d H:i:s');
     $db = $this->db;
-    $db->beginTransaction();
     try {
+      $db->beginTransaction();
       $stmt = $db->prepare('INSERT INTO stock_info ( item_id, stock_num, created_date )
                             VALUES (?,?,?)');
       $args = [
@@ -59,7 +59,7 @@ class Admin_Db {
       $db->commit();
     } catch ( PDOException $e ) {
       $db->rollBack();
-      $e->getMessage();
+      echo $e->getMessage();
     }
   }
 
@@ -83,7 +83,7 @@ class Admin_Db {
       }
       return $items;
     } catch ( PDOException $e ) {
-      $e->getMessage();
+      echo $e->getMessage();
     }
   }
 
@@ -91,8 +91,8 @@ class Admin_Db {
     $db = $this->db;
     $stock_num = (int)$input['stock-update'];
     $item_id = (int)$input['item-id'];
-    $db->beginTransaction();
     try {
+      $db->beginTransaction();
       $stmt = $db->prepare('UPDATE stock_info SET stock_num = :stock WHERE item_id = :id');
       $stmt->bindValue(':stock', $stock_num, PDO::PARAM_INT);
       $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
@@ -100,7 +100,24 @@ class Admin_Db {
       $db->commit();
     } catch ( PDOException $e ) {
       $db->rollBack();
-      $e->getMessage();
+      echo $e->getMessage();
+    }
+  }
+
+  public function update_item_status ( $input ) {
+    $db = $this->db;
+    $reverse_status = (int)$input['reverse-status'];
+    $item_id = (int)$input['item-id'];
+    try {
+      $db->beginTransaction();
+      $stmt = $db->prepare('UPDATE item_info SET public_status = :status WHERE id = :id');
+      $stmt->bindValue(':status', $reverse_status, PDO::PARAM_INT);
+      $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+      echo $e->getMessage();
     }
   }
 

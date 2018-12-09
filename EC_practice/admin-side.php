@@ -21,6 +21,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
       $stock_update->action_update_item_stock( $input );
       $stock_update->page_render();
       break;
+    case 'change-status':
+      $change_status = new Product_Manage();
+      $change_status->action_update_item_status( $input );
+      $change_status->page_render();
+      break;
 
   }
 

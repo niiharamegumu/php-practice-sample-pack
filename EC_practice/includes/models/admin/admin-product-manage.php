@@ -34,4 +34,13 @@ class Product_Manage {
     $db->update_item_stock( $input );
   }
 
+  public function action_update_item_status ( $input ) {
+    $this->update_item_status( $input );
+  }
+
+  private function update_item_status ( $input ) {
+    $db = $this->db;
+    $db->update_item_status( $input );
+  }
+
 }

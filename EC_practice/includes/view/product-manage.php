@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>商品管理ページ</title>
-  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -69,10 +69,14 @@
               <td>
                 <?php if ( (int)$item['public_status'] === 0 ) : ?>
                   <input type="submit" value="非公開→公開">
+                  <input type="hidden" name="reverse-status" value="1">
                 <?php else : ?>
                   <input type="submit" value="公開→非公開">
+                  <input type="hidden" name="reverse-status" value="0">
                 <?php endif; ?>
               </td>
+              <input type="hidden" name="item-id" value="<?php echo $item['id']; ?>">
+              <input type="hidden" name="submit-type" value="change-status">
             </form>
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
               <td><input type="submit" name="delete-item" value="削除する"></td>
