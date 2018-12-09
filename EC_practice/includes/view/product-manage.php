@@ -54,7 +54,7 @@
         <tbody>
           <?php foreach ( $items as $item ) : ?>
           <tr>
-            <td><img src="images/<?php echo $item['item_img']; ?>"></td>
+            <td><img src="images/<?php echo $item['item_img']; ?>" width="140" height="100"></td>
             <td><?php echo $item['item_name']; ?></td>
             <td><?php echo $item['item_price']; ?></td>
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
@@ -80,6 +80,8 @@
             </form>
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
               <td><input type="submit" name="delete-item" value="削除する"></td>
+              <input type="hidden" name="item-id" value="<?php echo $item['id']; ?>">
+              <input type="hidden" name="submit-type" value="delete-item">
             </form>
           </tr>
             <?php endforeach; ?>

@@ -25,6 +25,14 @@ class Product_Manage {
     $db->insert_option_stock( $input, $insert_id );
   }
 
+  public function action_delete_product_data ( $input ) {
+    $this->delete_product_data( $input );
+  }
+  private function delete_product_data ( $input ) {
+    $db = $this->db;
+    $db->delete_product_data( $input );
+  }
+
   public function action_update_item_stock ( $input ) {
     $this->update_item_stock( $input );
   }

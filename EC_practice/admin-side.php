@@ -10,6 +10,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
   $input = $_POST;
 
   require_once('includes/models/admin/admin-product-manage.php');
+  
   switch ( $input['submit-type'] ) {
     case 'add-item':
       $add_item = new Product_Manage();
@@ -26,7 +27,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
       $change_status->action_update_item_status( $input );
       $change_status->page_render();
       break;
-
+    case 'delete-item':
+      $delete_item = new Product_Manage();
+      $delete_item->action_delete_product_data( $input );
+      $delete_item->page_render();
+      break;
   }
 
 } else {

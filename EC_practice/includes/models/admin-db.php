@@ -67,16 +67,17 @@ class Admin_Db {
     $items = [];
     $date = date('Y-m-d H:i:s');
     $db = $this->db;
-    $sql = "SELECT i.id,
-                   i.item_name,
-                   i.item_img,
-                   i.item_price,
-                   i.public_status,
-                   s.stock_num
-            FROM item_info as i
-            JOIN stock_info as s
-            ON i.id = s.item_id";
     try {
+      $sql = "SELECT i.id,
+              i.item_name,
+              i.item_img,
+              i.item_price,
+              i.public_status,
+              s.stock_num
+              FROM item_info as i
+              JOIN stock_info as s
+              ON i.id = s.item_id";
+
       $stmt = $db->query( $sql );
       while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
         $items[] = $row;
@@ -113,6 +114,29 @@ class Admin_Db {
       $stmt = $db->prepare('UPDATE item_info SET public_status = :status WHERE id = :id');
       $stmt->bindValue(':status', $reverse_status, PDO::PARAM_INT);
       $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+      echo $e->getMessage();
+    }
+  }
+
+  public function delete_product_data ( $input ) {
+    $db = $this->db;
+    $item_id = (int)$input['item-id'];
+    try {
+      $db->beginTransaction();
+      $sql = "DELETE i, s
+              FROM item_info as i
+              JOIN stock_info as s
+              ON i.id = s.item_id
+              WHERE i.id = :id
+              AND s.item_id = :id";
+
+      $stmt = $db->prepare( $sql );
+      $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
+      // ON DELETE => CASCADE
       $stmt->execute();
       $db->commit();
     } catch ( PDOException $e ) {
