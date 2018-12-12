@@ -2,10 +2,12 @@
 
 class Admin_Db {
   private $db;
+  private $success_msg = [];
+  private $err_msg = [];
+
 
   public function __construct() {
     $this->db = $this->db_connect();
-    return $this->db;
   }
 
   public function db_connect () {
@@ -39,7 +41,7 @@ class Admin_Db {
       return $id;
     } catch ( PDOException $e ) {
       $db->rollBack();
-      echo $e->getMessage();
+      echo 'insert_options_item ' . $e->getMessage();
     }
   }
 
@@ -59,7 +61,7 @@ class Admin_Db {
       $db->commit();
     } catch ( PDOException $e ) {
       $db->rollBack();
-      echo $e->getMessage();
+      echo 'insert_option_stock ' . $e->getMessage();
     }
   }
 
@@ -99,10 +101,12 @@ class Admin_Db {
       $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
       $stmt->execute();
       $db->commit();
+      $this->success_msg[] = '在庫数を変更しました。';
     } catch ( PDOException $e ) {
       $db->rollBack();
-      echo $e->getMessage();
+      $this->err_msg[] = '在庫数の変更に失敗しました。';
     }
+    return array($this->success_msg, $this->err_msg);
   }
 
   public function update_item_status ( $input ) {
@@ -116,10 +120,12 @@ class Admin_Db {
       $stmt->bindValue(':id', $item_id, PDO::PARAM_INT);
       $stmt->execute();
       $db->commit();
+      $this->success_msg[] = 'ステータスを変更しました。';
     } catch ( PDOException $e ) {
       $db->rollBack();
-      echo $e->getMessage();
+      $this->err_msg[] = 'ステータスの変更に失敗しました。';
     }
+    return array($this->success_msg, $this->err_msg);
   }
 
   public function delete_product_data ( $input ) {

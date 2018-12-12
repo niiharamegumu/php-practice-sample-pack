@@ -1,16 +1,18 @@
 <?php
 function img_file_upload () {
   $temp_file = $_FILES['item-img']['tmp_name'];
+  $file_name = "./images/" . $_FILES['item-img']['name'];
+  $ext = get_extension( $file_name );
+  $img_name = get_uniq_num() . $ext;
 
-  if (is_uploaded_file($temp_file)) {
-    $file_name = "./images/" . $_FILES['item-img']['name'];
-    $ext = get_extension( $file_name );
-    $img_name = get_uniq_num() . $ext;
-
+  if ( is_uploaded_file($temp_file) ) {
     move_uploaded_file($temp_file, $file_name );
     rename($file_name, "./images/" . $img_name);
+    return $img_name;
+  } else {
+    return '';
   }
-  return $img_name;
+
 }
 
 function get_extension ( $file_name ) {

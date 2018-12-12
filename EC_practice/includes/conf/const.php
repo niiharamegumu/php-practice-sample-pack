@@ -1,5 +1,8 @@
 <?php
-$err_msg = array();
+$err_msg = [];
+$success_msg = [];
+$success = [];
+$err = [];
 
 define('DSN',   '');
 define('DB_USER',   '');

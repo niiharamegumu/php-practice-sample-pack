@@ -2,12 +2,14 @@
 
 class Product_Manage {
   private $db;
+  private $checker;
 
   public function __construct () {
     $this->db = new Admin_Db();
+    $this->checker = new Err_Checker();
   }
 
-  public function page_render () {
+  public function page_render ( $messages = [] ) {
     $db = $this->db;
     $items = $db->get_items_list();
     $items = entity_assoc_array( $items );
@@ -15,14 +17,24 @@ class Product_Manage {
   }
 
   public function action_insert_product_data ( $input ) {
-    $this->insert_product_data( $input );
+    return $this->insert_product_data( $input );
   }
 
   private function insert_product_data ( $input ) {
     $db = $this->db;
-    $input['item-img'] = img_file_upload();
-    $insert_id = $db->insert_options_item( $input );
-    $db->insert_option_stock( $input, $insert_id );
+    $checker = $this->checker;
+
+    $err_msg = $checker->check_insert_options_item();
+
+    if ( count( $err_msg ) > 0 ) {
+      return $err_msg;
+    } else {
+      $input['item-img'] = img_file_upload();
+      $insert_id = $db->insert_options_item( $input );
+      $db->insert_option_stock( $input, $insert_id );
+      return array();
+    }
+
   }
 
   public function action_delete_product_data ( $input ) {
@@ -34,21 +46,23 @@ class Product_Manage {
   }
 
   public function action_update_item_stock ( $input ) {
-    $this->update_item_stock( $input );
+    return $this->update_item_stock( $input );
   }
 
   private function update_item_stock ( $input ) {
     $db = $this->db;
-    $db->update_item_stock( $input );
+    list( $success_msg, $err_msg ) = $db->update_item_stock( $input );
+    return array($success_msg, $err_msg);
   }
 
   public function action_update_item_status ( $input ) {
-    $this->update_item_status( $input );
+    return $this->update_item_status( $input );
   }
 
   private function update_item_status ( $input ) {
     $db = $this->db;
-    $db->update_item_status( $input );
+    list( $success_msg, $err_msg ) = $db->update_item_status( $input );
+    return array($success_msg, $err_msg);
   }
 
 }

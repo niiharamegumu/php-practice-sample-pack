@@ -1,41 +1,44 @@
 <?php
-
 require_once('includes/conf/const.php');
 require_once('includes/models/admin-db.php');
+require_once('includes/models/err-checker.php');
 require_once('includes/models/functions.php');
+require_once('includes/models/admin-product-manage.php');
 
-
+$manage = new Product_Manage();
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
   $input = $_POST;
-
-  require_once('includes/models/admin/admin-product-manage.php');
-  
   switch ( $input['submit-type'] ) {
     case 'add-item':
-      $add_item = new Product_Manage();
-      $add_item->action_insert_product_data( $input );
-      $add_item->page_render();
+      $err = $manage->action_insert_product_data( $input );
       break;
     case 'stock-update':
-      $stock_update = new Product_Manage();
-      $stock_update->action_update_item_stock( $input );
-      $stock_update->page_render();
+      list( $success, $err ) = $manage->action_update_item_stock( $input );
       break;
     case 'change-status':
-      $change_status = new Product_Manage();
-      $change_status->action_update_item_status( $input );
-      $change_status->page_render();
+      list( $success, $err ) = $manage->action_update_item_status( $input );
       break;
     case 'delete-item':
-      $delete_item = new Product_Manage();
-      $delete_item->action_delete_product_data( $input );
-      $delete_item->page_render();
+      $manage->action_delete_product_data( $input );
       break;
   }
 
+
+  $success_msg = $success;
+  $err_msg = $err;
+
+  if ( count($success_msg) > 0 ) {
+    $manage->page_render( $success_msg );
+  } elseif ( count($err_msg) > 0 ) {
+    $manage->page_render( $err_msg );
+  } else {
+    header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+  }
+
+
 } else {
-  include_once('includes/view/product-manage.php');
+  $manage->page_render();
 }
 
 

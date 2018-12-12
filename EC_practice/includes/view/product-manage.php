@@ -10,6 +10,14 @@
   <div class="admin-wrapper">
     <h1>商品管理ページ</h1>
 
+    <?php if ( count($messages) > 0 ) : ?>
+      <ul>
+        <?php foreach ( $messages as $message ) : ?>
+          <li><?php echo $message; ?></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+
     <section class="addition">
       <h2>商品の登録</h2>
       <form method="post" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>">
@@ -22,8 +30,8 @@
         <label for="stock-num">個数</label>：
         <input type="text" name="stock-num" value="" id="stock-num"><br>
 
-        <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
         <label for="item-img">商品画像</label>
+        <input type="hidden" name="MAX_FILE_SIZE" value="2097152" />
         <input type="file" name="item-img" id="item-img"><br>
 
         <select name="public-status">
