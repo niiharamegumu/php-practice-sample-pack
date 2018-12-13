@@ -34,17 +34,10 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $manage->page_render( $err_msg );
   } else {
     header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    // $manage->page_render();
   }
 
 
 } else {
   $manage->page_render();
 }
-
-
-
-
-
-
-
-?>

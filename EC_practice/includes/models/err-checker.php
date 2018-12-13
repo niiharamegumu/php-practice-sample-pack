@@ -21,8 +21,15 @@ class Err_Checker {
       $err_msg[] = '商品の個数は、0以上の整数です。';
     }
 
-    if ( $_FILES['item-img']['error'] === 4 ) {
+    $img_err = $_FILES['item-img']['error'];
+    if ( $img_err === 1 || $img_err === 2 ) {
+      $err_msg[] = 'ファイルサイズが大きすぎます。';
+    } elseif ( $img_err === 4 ) {
       $err_msg[] = '商品の画像を選択してください。';
+    }
+    $img_extension_check = $_FILES['item-img']['name'];
+    if ( !preg_match( '/\.png$|\.jpg$|\.jpeg$/i', $img_extension_check ) ) {
+      $err_msg[] = '画像の拡張子は、.jpg.jpeg or .png でお願いします。';
     }
 
     if ( !isset($_POST['public-status']) ) {
