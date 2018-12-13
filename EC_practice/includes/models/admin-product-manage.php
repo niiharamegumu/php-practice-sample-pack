@@ -51,8 +51,14 @@ class Product_Manage {
 
   private function update_item_stock ( $input ) {
     $db = $this->db;
-    list( $success_msg, $err_msg ) = $db->update_item_stock( $input );
-    return array($success_msg, $err_msg);
+    $checker = $this->checker;
+    $err_msg = $checker->check_update_item_stock();
+    if ( count($err_msg) > 0 ) {
+      return array( [], $err_msg );
+    } else {
+      list( $success_msg, $err_msg ) = $db->update_item_stock( $input );
+      return array($success_msg, $err_msg);
+    }
   }
 
   public function action_update_item_status ( $input ) {

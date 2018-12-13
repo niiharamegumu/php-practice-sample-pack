@@ -1,0 +1,17 @@
+@charset "UTF-8";
+a {
+  text-decoration: none;
+}
+
+.admin-wrapper nav ul {
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+}
+.admin-wrapper nav ul li {
+  margin-right: 20px;
+}
+.admin-wrapper nav ul li a {
+  display: block;
+}

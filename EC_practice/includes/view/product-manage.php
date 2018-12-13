@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>商品管理ページ</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
   <div class="admin-wrapper">
     <h1>商品管理ページ</h1>
+    <nav>
+      <ul>
+        <li><a href="logout.php">ログアウト</a></li>
+        <li><a href="admin-side-user.php">ユーザ管理ページ</a></li>
+      </ul>
+    </nav>
 
     <?php if ( count($messages) > 0 ) : ?>
       <ul>

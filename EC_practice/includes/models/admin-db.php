@@ -65,6 +65,29 @@ class Admin_Db {
     }
   }
 
+  public function insert_user_data ( $input ) {
+    $date = date('Y-m-d H:i:s');
+    $db = $this->db;
+    try {
+      $db->beginTransaction();
+      $stmt = $db->prepare('INSERT INTO user_info ( user_name, password, created_date )
+                            VALUES (?,?,?)');
+      $args = [
+        $input['user-name'],
+        $input['user-pw'],
+        $date
+      ];
+      $stmt->execute( $args );
+      $db->commit();
+      $this->success_msg[] = '登録完了!';
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+      echo 'insert_user_data ' . $e->getMessage();
+    }
+    return $this->success_msg;
+
+  }
+
   public function get_items_list () {
     $items = [];
     $date = date('Y-m-d H:i:s');

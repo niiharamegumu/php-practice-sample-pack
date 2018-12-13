@@ -12,13 +12,13 @@ class Err_Checker {
     if ( !isset($_POST['item-price']) || mb_strlen( $_POST['item-price'] ) === 0 ) {
       $err_msg[] = '商品の値段を入力してください。';
     } elseif ( !filter_input( INPUT_POST, 'item-price', FILTER_VALIDATE_INT ) ) {
-      $err_msg[] = '商品の値段は、0以上の整数です。';
+      $err_msg[] = '商品の値段は、0以上の半角整数です。';
     }
 
     if (!isset($_POST['stock-num']) || mb_strlen( $_POST['stock-num'] ) === 0) {
       $err_msg[] = '商品の個数を入力してください。';
     } elseif ( !filter_input( INPUT_POST, 'stock-num', FILTER_VALIDATE_INT ) ) {
-      $err_msg[] = '商品の個数は、0以上の整数です。';
+      $err_msg[] = '商品の個数は、0以上の半角整数です。';
     }
 
     $img_err = $_FILES['item-img']['error'];
@@ -40,6 +40,14 @@ class Err_Checker {
 
     return $err_msg;
 
+  }
+
+  public function check_update_item_stock () {
+    $err_msg = $this->err_msg;
+    if ( !filter_input( INPUT_POST, 'stock-update', FILTER_VALIDATE_INT ) ) {
+      $err_msg[] = '商品の個数は、0以上の半角整数です。';
+    }
+    return $err_msg;
   }
 
 
