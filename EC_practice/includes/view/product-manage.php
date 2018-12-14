@@ -68,7 +68,7 @@
         <tbody>
           <?php foreach ( $items as $item ) : ?>
           <tr>
-            <td><img src="images/<?php echo $item['item_img']; ?>" width="140" height="100"></td>
+            <td><img src="images/<?php echo $item['item_img']; ?>"></td>
             <td><?php echo $item['item_name']; ?></td>
             <td><?php echo $item['item_price']; ?></td>
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">

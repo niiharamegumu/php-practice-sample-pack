@@ -50,7 +50,7 @@ class Err_Checker {
     return $err_msg;
   }
 
-  public function check_user_data ( $name_count ) {
+  public function check_user_register_data ( $name_count ) {
     $err_msg = $this->err_msg;
     if ( !preg_match( '/^[0-9a-z]{6,}$/i', $_POST['user-name']) ) {
       $err_msg[] = '名前・パスワードは６文字以上の半角英数字でお願いします。';

@@ -113,6 +113,21 @@ class Admin_Db {
     }
   }
 
+  public function get_user_data () {
+    $db = $this->db;
+    $uers = [];
+    try {
+      $sql = "SELECT user_name, created_date FROM user_info";
+      $stmt = $db->query( $sql );
+      while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
+        $users[] = $row;
+      }
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $users;
+  }
+
   public function count_duplicate_user_data ( $column, $data ) {
     $db = $this->db;
     $count = 0;
@@ -126,6 +141,26 @@ class Admin_Db {
       $sql = "SELECT COUNT( * ) FROM user_info WHERE " . $db_column . " = ?";
       $stmt = $db->prepare( $sql );
       $stmt->execute( array($data) );
+      $count = (int)$stmt->fetchColumn();
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $count;
+
+  }
+
+  public function user_login ( $input ) {
+    $db = $this->db;
+    $count = 0;
+    try {
+      $sql = "SELECT COUNT( * ) FROM user_info
+              WHERE user_name = ? AND password = ?";
+      $stmt = $db->prepare( $sql );
+      $args = [
+        $input['login-user-name'],
+        $input['login-user-pw']
+      ];
+      $stmt->execute( $args );
       $count = (int)$stmt->fetchColumn();
     } catch ( PDOException $e ) {
       echo $e->getMessage();

@@ -2,16 +2,42 @@
 a {
   text-decoration: none;
 }
+table {
+  border-collapse: collapse;
+  text-align: center;
+}
+.admin-user-wrapper table,
+ .admin-wrapper table {
+  width: 900px;
+}
+tr,th,td {
+  border: 1px solid #aaa;
+  padding: 10px 0;
+}
+.admin-user-wrapper tr:nth-child(even),
+.product-info tbody tr:nth-child(odd) {
+  background-color: #eee;
+}
+.admin-user-wrapper table tr:first-child th {
+  width: 70%;
+}
 
-.admin-wrapper nav ul {
+.admin-wrapper nav ul,
+.admin-user-wrapper nav ul {
   border-bottom: 1px solid #ccc;
   display: flex;
   list-style: none;
   padding-left: 0;
 }
-.admin-wrapper nav ul li {
+.admin-wrapper nav ul li,
+.admin-user-wrapper nav ul li {
   margin-right: 20px;
 }
-.admin-wrapper nav ul li a {
+.admin-wrapper nav ul li a,
+.admin-user-wrapper nav ul li a {
   display: block;
+}
+.product-info tbody img {
+  height: 100px;
+  width: 150px;
 }
