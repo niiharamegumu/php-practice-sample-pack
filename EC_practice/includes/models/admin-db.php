@@ -82,9 +82,9 @@ class Admin_Db {
       $this->success_msg[] = '登録完了!';
     } catch ( PDOException $e ) {
       $db->rollBack();
-      echo 'insert_user_data ' . $e->getMessage();
+      $this->err_msg[] = '登録に失敗しました。';
     }
-    return $this->success_msg;
+    return array($this->success_msg, $this->err_msg);
 
   }
 
@@ -111,6 +111,27 @@ class Admin_Db {
     } catch ( PDOException $e ) {
       echo $e->getMessage();
     }
+  }
+
+  public function count_duplicate_user_data ( $column, $data ) {
+    $db = $this->db;
+    $count = 0;
+    $db_column = '';
+    switch ( $column ) {
+      case 'user_name':
+        $db_column = 'user_name';
+        break;
+    }
+    try {
+      $sql = "SELECT COUNT( * ) FROM user_info WHERE " . $db_column . " = ?";
+      $stmt = $db->prepare( $sql );
+      $stmt->execute( array($data) );
+      $count = (int)$stmt->fetchColumn();
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $count;
+
   }
 
   public function update_item_stock ( $input ) {

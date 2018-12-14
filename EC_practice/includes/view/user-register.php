@@ -20,7 +20,7 @@
         <label for="user-name">ユーザー名</label>：
         <input type="text" name="user-name" value="" placeholder="ユーザー名"><br>
         <label for="user-pw">パスワード</label>：
-        <input type="text" name="user-pw" value="" placeholder="パスワード">
+        <input type="password" name="user-pw" value="" placeholder="パスワード">
       </div>
       <input type="submit" value="新規作成する">
     </form>

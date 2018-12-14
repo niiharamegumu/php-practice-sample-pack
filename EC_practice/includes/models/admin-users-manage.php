@@ -16,9 +16,20 @@ class Users_Manage {
   public function action_insert_user_data ( $input ) {
     return $this->insert_user_data( $input );
   }
+
   private function insert_user_data ( $input ) {
     $db = $this->db;
-    return $db->insert_user_data( $input );
+    $checker = $this->checker;
+    $name_count = $db->count_duplicate_user_data( 'user_name', $input['user-name'] );
+    $err_msg = $checker->check_user_data( $name_count );
+
+    if ( count($err_msg) > 0 ) {
+      return array( [], $err_msg );
+    } else {
+      list( $success_msg, $err_msg ) = $db->insert_user_data( $input );
+      return array( $success_msg, $err_msg );
+    }
+
   }
 
 }
