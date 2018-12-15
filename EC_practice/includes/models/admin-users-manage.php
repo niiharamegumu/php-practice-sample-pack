@@ -9,6 +9,16 @@ class Users_Manage {
     $this->checker = new Err_Checker();
   }
 
+  public function check_admin_user ( $input ) {
+    $admin_name = 'admin';
+    $admin_pw = 'admin';
+    if ( ($input['login-user-name'] === $admin_name) && ($input['login-user-pw'] === $admin_pw) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public function register_page_render ( $messages = [] ) {
     include_once('includes/view/user-register.php');
   }
@@ -26,13 +36,16 @@ class Users_Manage {
   }
 
   public function action_user_login ( $input ) {
-    return $this->user_login( $input );
+    return $this->get_user_login_pw( $input );
   }
-  private function user_login ( $input ) {
+  private function get_user_login_pw ( $input ) {
     $db = $this->db;
-    $count = 0;
-    $count = $db->user_login( $input );
-    if ( $count === 1 ) {
+    $row = [];
+    $login_flag = false;
+
+    $row = $db->get_user_login_pw( $input );
+    $login_flag = password_verify( $input['login-user-pw'], $row['password'] );
+    if ( $login_flag ) {
       return true;
     } else {
       return false;

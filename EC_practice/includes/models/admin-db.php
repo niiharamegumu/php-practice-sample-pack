@@ -74,7 +74,7 @@ class Admin_Db {
                             VALUES (?,?,?)');
       $args = [
         $input['user-name'],
-        $input['user-pw'],
+        password_hash($input['user-pw'], PASSWORD_BCRYPT),
         $date
       ];
       $stmt->execute( $args );
@@ -117,7 +117,7 @@ class Admin_Db {
     $db = $this->db;
     $uers = [];
     try {
-      $sql = "SELECT user_name, created_date FROM user_info";
+      $sql = "SELECT user_name, password, created_date FROM user_info";
       $stmt = $db->query( $sql );
       while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
         $users[] = $row;
@@ -149,23 +149,22 @@ class Admin_Db {
 
   }
 
-  public function user_login ( $input ) {
+  public function get_user_login_pw ( $input ) {
     $db = $this->db;
-    $count = 0;
+    $row = [];
     try {
-      $sql = "SELECT COUNT( * ) FROM user_info
-              WHERE user_name = ? AND password = ?";
+      $sql = "SELECT password FROM user_info
+              WHERE user_name = ?";
       $stmt = $db->prepare( $sql );
       $args = [
-        $input['login-user-name'],
-        $input['login-user-pw']
+        $input['login-user-name']
       ];
       $stmt->execute( $args );
-      $count = (int)$stmt->fetchColumn();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
     } catch ( PDOException $e ) {
       echo $e->getMessage();
     }
-    return $count;
+    return $row;
 
   }
 
