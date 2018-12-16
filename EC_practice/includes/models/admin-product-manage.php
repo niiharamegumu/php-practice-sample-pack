@@ -9,17 +9,26 @@ class Product_Manage {
     $this->checker = new Err_Checker();
   }
 
-  public function page_render ( $messages = [] ) {
+  public function admin_page_render ( $messages = [] ) {
     $db = $this->db;
     $items = $db->get_items_list();
     $items = entity_assoc_array( $items );
     include_once('includes/view/product-manage.php');
   }
 
+  public function product_list_page_render ( $messages = [] ) {
+    $db = $this->db;
+    $public_products = $db->get_public_product();
+    if ( count($public_products) === 0 ) {
+      $messages[] = '公開中の商品がありません。';
+    }
+    $public_products = entity_assoc_array( $public_products );
+    include_once('includes/view/product-list.php');
+  }
+
   public function action_insert_product_data ( $input ) {
     return $this->insert_product_data( $input );
   }
-
   private function insert_product_data ( $input ) {
     $db = $this->db;
     $checker = $this->checker;
@@ -37,6 +46,20 @@ class Product_Manage {
 
   }
 
+  public function action_insert_cart ( $input ) {
+    return $this->insert_cart( $input );
+  }
+  private function insert_cart ( $input ) {
+    $db = $this->db;
+    $row = [];
+    $row = $db->get_duplicate_cart_item( $input );
+    if ( $row ) {
+      return $success_msg = $db->update_cart( $input, (int)$row['amount_num'] );
+    } else {
+      return $success_msg = $db->insert_cart( $input );
+    }
+  }
+
   public function action_delete_product_data ( $input ) {
     $this->delete_product_data( $input );
   }
@@ -48,7 +71,6 @@ class Product_Manage {
   public function action_update_item_stock ( $input ) {
     return $this->update_item_stock( $input );
   }
-
   private function update_item_stock ( $input ) {
     $db = $this->db;
     $checker = $this->checker;
@@ -64,7 +86,6 @@ class Product_Manage {
   public function action_update_item_status ( $input ) {
     return $this->update_item_status( $input );
   }
-
   private function update_item_status ( $input ) {
     $db = $this->db;
     list( $success_msg, $err_msg ) = $db->update_item_status( $input );

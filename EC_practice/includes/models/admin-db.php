@@ -88,9 +88,52 @@ class Admin_Db {
 
   }
 
+  public function insert_cart ( $input ) {
+    $date = date('Y-m-d H:i:s');
+    $db = $this->db;
+    $amount_num = 1;
+    try {
+      $db->beginTransaction();
+      $sql = "INSERT INTO cart_info (
+                user_id, item_id, amount_num, created_date
+              )
+              VALUES ( ?, ?, ?, ? )";
+      $stmt = $db->prepare( $sql );
+      $args = [
+        $_SESSION['user_id'],
+        $input['item-id'],
+        $amount_num,
+        $date
+      ];
+      $stmt->execute( $args );
+      $db->commit();
+      $this->success_msg[] = 'カートに追加しました。';
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+    }
+    return $this->success_msg;
+  }
+
+  public function update_cart ( $input, $num ) {
+    $db = $this->db;
+    $amount_num = ++$num;
+    try {
+      $db->beginTransaction();
+      $sql = "UPDATE cart_info SET amount_num = :num WHERE item_id = :id";
+      $stmt = $db->prepare( $sql );
+      $stmt->bindValue(':num', $amount_num, PDO::PARAM_INT);
+      $stmt->bindValue(':id', $input['item-id'],PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+      $this->success_msg[] = 'カートに追加しました。';
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+    }
+    return $this->success_msg;
+  }
+
   public function get_items_list () {
     $items = [];
-    $date = date('Y-m-d H:i:s');
     $db = $this->db;
     try {
       $sql = "SELECT i.id,
@@ -107,10 +150,36 @@ class Admin_Db {
       while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
         $items[] = $row;
       }
-      return $items;
     } catch ( PDOException $e ) {
       echo $e->getMessage();
     }
+    return $items;
+  }
+
+  public function get_public_product () {
+    $public_products = [];
+    $db = $this->db;
+    try {
+      $sql = "SELECT i.id,
+              i.item_name,
+              i.item_img,
+              i.item_price,
+              s.stock_num
+              FROM item_info as i
+              JOIN stock_info as s
+              ON i.id = s.item_id
+              WHERE public_status = 1";
+
+      $stmt = $db->query( $sql );
+      while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
+        $public_products[] = $row;
+      }
+
+    } catch (PDOException $e) {
+      echo $e->getMessage();
+    }
+    return $public_products;
+
   }
 
   public function get_user_data () {
@@ -149,11 +218,26 @@ class Admin_Db {
 
   }
 
+  public function get_duplicate_cart_item ( $input ) {
+    $db = $this->db;
+    try {
+      $sql = "SELECT amount_num FROM cart_info WHERE item_id = :id";
+      $stmt = $db->prepare( $sql );
+      $stmt->bindValue(':id', $input['item-id'], PDO::PARAM_INT);
+      $stmt->execute();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $row;
+
+  }
+
   public function get_user_login_pw ( $input ) {
     $db = $this->db;
     $row = [];
     try {
-      $sql = "SELECT password FROM user_info
+      $sql = "SELECT id, password FROM user_info
               WHERE user_name = ?";
       $stmt = $db->prepare( $sql );
       $args = [

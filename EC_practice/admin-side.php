@@ -11,33 +11,29 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
   $input = $_POST;
   switch ( $input['submit-type'] ) {
     case 'add-item':
-      $err = $manage->action_insert_product_data( $input );
+      $err_msg = $manage->action_insert_product_data( $input );
       break;
     case 'stock-update':
-      list( $success, $err ) = $manage->action_update_item_stock( $input );
+      list( $success_msg, $err_msg ) = $manage->action_update_item_stock( $input );
       break;
     case 'change-status':
-      list( $success, $err ) = $manage->action_update_item_status( $input );
+      list( $success_msg, $err_msg ) = $manage->action_update_item_status( $input );
       break;
     case 'delete-item':
       $manage->action_delete_product_data( $input );
       break;
   }
 
-
-  $success_msg = $success;
-  $err_msg = $err;
-
   if ( count($success_msg) > 0 ) {
-    $manage->page_render( $success_msg );
+    $manage->admin_page_render( $success_msg );
   } elseif ( count($err_msg) > 0 ) {
-    $manage->page_render( $err_msg );
+    $manage->admin_page_render( $err_msg );
   } else {
     header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-    // $manage->page_render();
+    // $manage->admin_page_render();
   }
 
 
 } else {
-  $manage->page_render();
+  $manage->admin_page_render();
 }

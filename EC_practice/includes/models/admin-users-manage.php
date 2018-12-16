@@ -46,6 +46,8 @@ class Users_Manage {
     $row = $db->get_user_login_pw( $input );
     $login_flag = password_verify( $input['login-user-pw'], $row['password'] );
     if ( $login_flag ) {
+      $_SESSION['user_id'] = $row['id'];
+      $_SESSION['user_name'] = $input['login-user-name'];
       return true;
     } else {
       return false;

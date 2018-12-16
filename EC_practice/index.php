@@ -15,6 +15,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
   $admin_user = $manage->check_admin_user( $input );
   if ( $admin_user ) {
+    $_SESSION['admin_name'] = $input['login-user-name'];
     header( 'Location: http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER["SCRIPT_NAME"]) . '/admin-side.php');
   } else {
 
@@ -25,7 +26,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
       $err_msg[] = 'ユーザー名または、パスワードが違います。';
       $manage->login_page_render( $err_msg );
     }
-    
+
   }
 
 } else {
