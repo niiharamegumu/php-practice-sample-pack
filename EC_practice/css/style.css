@@ -2,6 +2,10 @@
 a {
   text-decoration: none;
 }
+img {
+  height: 100px;
+  width: 150px;
+}
 table {
   border-collapse: collapse;
   text-align: center;
@@ -36,8 +40,4 @@ tr,th,td {
 .admin-wrapper nav ul li a,
 .admin-user-wrapper nav ul li a {
   display: block;
-}
-.product-info tbody img {
-  height: 100px;
-  width: 150px;
 }

@@ -197,6 +197,33 @@ class Admin_Db {
     return $users;
   }
 
+  public function get_user_selected_cart_items () {
+    $db = $this->db;
+    $items = [];
+    $id;
+    try {
+      $sql = "SELECT c.id,
+                     c.amount_num,
+                     i.item_name,
+                     i.item_price,
+                     i.item_img
+              FROM cart_info as c
+              JOIN item_info as i
+              ON c.item_id = i.id
+              WHERE c.user_id = :id";
+      $stmt = $db->prepare( $sql );
+      $id = (int)$_SESSION['user_id'];
+      $stmt->bindValue( ':id', $id, PDO::PARAM_INT );
+      $stmt->execute();
+      while ( $row = $stmt->fetch(PDO::FETCH_ASSOC) ) {
+        $items[] = $row;
+      }
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $items;
+  }
+
   public function count_duplicate_user_data ( $column, $data ) {
     $db = $this->db;
     $count = 0;
@@ -311,6 +338,24 @@ class Admin_Db {
       $db->rollBack();
       echo $e->getMessage();
     }
+  }
+
+  public function delete_selected_item ( $input ) {
+    $db = $this->db;
+    $id = (int)$input['selected-item-id'];
+    try {
+      $db->beginTransaction();
+      $sql = "DELETE FROM cart_info WHERE id = :id";
+      $stmt = $db->prepare( $sql );
+      $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+      $this->success_msg[] = '削除しました。';
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+      echo $e->getMessage();
+    }
+    return $this->success_msg;
   }
 
 }

@@ -26,6 +26,28 @@ class Product_Manage {
     include_once('includes/view/product-list.php');
   }
 
+  public function cart_page_render ( $messages = [] ) {
+    $db = $this->db;
+    $items = $db->get_user_selected_cart_items();
+    if ( count($items) === 0 ) {
+      $messages[] = 'カートの中身は空です。';
+    }
+    $items = entity_assoc_array( $items );
+    $total = $this->get_cart_total_price( $items );
+    include_once('includes/view/cart.php');
+  }
+
+  private function get_cart_total_price ( $items ) {
+    $total = 0;
+    $items_count = count($items);
+    for ( $i = 0; $i < $items_count; $i++ ) {
+      $price = $items[$i]['item_price'];
+      $num = $items[$i]['amount_num'];
+      $total += $price * $num;
+    }
+    return $total;
+  }
+
   public function action_insert_product_data ( $input ) {
     return $this->insert_product_data( $input );
   }
@@ -90,6 +112,14 @@ class Product_Manage {
     $db = $this->db;
     list( $success_msg, $err_msg ) = $db->update_item_status( $input );
     return array($success_msg, $err_msg);
+  }
+
+  public function action_delete_selected_item ( $input ) {
+    return $this->delete_selected_item( $input );
+  }
+  private function delete_selected_item ( $input ) {
+    $db = $this->db;
+    return $db->delete_selected_item( $input );
   }
 
 }
