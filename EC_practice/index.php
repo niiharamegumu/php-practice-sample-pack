@@ -18,7 +18,6 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $_SESSION['admin_name'] = $input['login-user-name'];
     header( 'Location: http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER["SCRIPT_NAME"]) . '/admin-side.php');
   } else {
-
     $login_flag = $manage->action_user_login( $input );
     if ( $login_flag ) {
       header( 'Location: http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER["SCRIPT_NAME"]) . '/user-side-product-list.php');
@@ -26,7 +25,6 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
       $err_msg[] = 'ユーザー名または、パスワードが違います。';
       $manage->login_page_render( $err_msg );
     }
-
   }
 
 } else {

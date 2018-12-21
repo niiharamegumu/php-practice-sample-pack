@@ -11,14 +11,14 @@ class Err_Checker {
 
     if ( !isset($_POST['item-price']) || mb_strlen( $_POST['item-price'] ) === 0 ) {
       $err_msg[] = '商品の値段を入力してください。';
-    } elseif ( !filter_input( INPUT_POST, 'item-price', FILTER_VALIDATE_INT ) ) {
-      $err_msg[] = '商品の値段は、0以上の半角整数です。';
+    } elseif ( !$this->check_int_zero_over( $_POST['item-price'] ) ) {
+      $err_msg[] = '商品の値段は、0以上の半角数字です。';
     }
 
     if (!isset($_POST['stock-num']) || mb_strlen( $_POST['stock-num'] ) === 0) {
       $err_msg[] = '商品の個数を入力してください。';
-    } elseif ( !filter_input( INPUT_POST, 'stock-num', FILTER_VALIDATE_INT ) ) {
-      $err_msg[] = '商品の個数は、0以上の半角整数です。';
+    } elseif ( !$this->check_int_zero_over( $_POST['stock-num'] ) ) {
+      $err_msg[] = '商品の個数は、0以上の半角数字です。';
     }
 
     $img_err = $_FILES['item-img']['error'];
@@ -44,8 +44,8 @@ class Err_Checker {
 
   public function check_update_item_stock () {
     $err_msg = $this->err_msg;
-    if ( !filter_input( INPUT_POST, 'stock-update', FILTER_VALIDATE_INT ) ) {
-      $err_msg[] = '商品の個数は、0以上の半角整数です。';
+    if ( !$this->check_int_zero_over( $_POST['stock-update']) ) {
+      $err_msg[] = '商品の個数は、0以上の半角数字です。';
     }
     return $err_msg;
   }
@@ -60,6 +60,22 @@ class Err_Checker {
     }
 
     return $err_msg;
+  }
+
+  public function check_int_zero_over ( $subject ) {
+    if ( preg_match('/^[0-9]+$/', $subject ) ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function check_positive_integer ( $subject ) {
+    if ( preg_match('/^[1-9][0-9]*$/', $subject ) ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 

@@ -182,6 +182,24 @@ class Admin_Db {
 
   }
 
+  public function get_stock_num_item_id ( int $id ) {
+    $db = $this->db;
+    $row = [];
+    $stock_num = 0;
+    try {
+      $sql = "SELECT stock_num FROM stock_info WHERE item_id = :id";
+      $stmt = $db->prepare( $sql );
+      $stmt->bindValue( ':id', $id, PDO::PARAM_INT );
+      $stmt->execute();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      $stock_num = (int)$row['stock_num'];
+    } catch ( PDOException $e ) {
+      echo $e->getMessage();
+    }
+    return $stock_num;
+
+  }
+
   public function get_user_data () {
     $db = $this->db;
     $uers = [];
@@ -204,6 +222,7 @@ class Admin_Db {
     try {
       $sql = "SELECT c.id,
                      c.amount_num,
+                     c.item_id,
                      i.item_name,
                      i.item_price,
                      i.item_img
@@ -298,6 +317,20 @@ class Admin_Db {
     return array($this->success_msg, $this->err_msg);
   }
 
+  public function reduce_item_stock ( int $num, int $id ) {
+    $db = $this->db;
+    try {
+      $db->beginTransaction();
+      $stmt = $db->prepare('UPDATE stock_info SET stock_num = :stock WHERE item_id = :id');
+      $stmt->bindValue(':stock', $num, PDO::PARAM_INT);
+      $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+    }
+  }
+
   public function update_item_status ( $input ) {
     $db = $this->db;
     $reverse_status = (int)$input['reverse-status'];
@@ -340,9 +373,8 @@ class Admin_Db {
     }
   }
 
-  public function delete_selected_item ( $input ) {
+  public function delete_selected_item ( int $id ) {
     $db = $this->db;
-    $id = (int)$input['selected-item-id'];
     try {
       $db->beginTransaction();
       $sql = "DELETE FROM cart_info WHERE id = :id";
@@ -356,6 +388,25 @@ class Admin_Db {
       echo $e->getMessage();
     }
     return $this->success_msg;
+  }
+
+  public function update_selected_item_num ( $input ) {
+    $db = $this->db;
+    $cart_item_id = (int)$input['selected-item-id'];
+    $update_num = (int)$input['selected-item-num'];
+    try {
+      $db->beginTransaction();
+      $stmt = $db->prepare('UPDATE cart_info SET amount_num = :num WHERE id = :id');
+      $stmt->bindValue(':num', $update_num, PDO::PARAM_INT);
+      $stmt->bindValue(':id', $cart_item_id, PDO::PARAM_INT);
+      $stmt->execute();
+      $db->commit();
+      $this->success_msg[] = '選択したアイテム数を更新しました。';
+    } catch ( PDOException $e ) {
+      $db->rollBack();
+      $this->err_msg[] = '選択したアイテム数の更新に失敗しました。';
+    }
+    return array($this->success_msg, $this->err_msg);
   }
 
 }

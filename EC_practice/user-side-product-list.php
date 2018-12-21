@@ -9,8 +9,6 @@ session_start();
 $manage = new Product_Manage();
 
 
-
-
 if ( isset($_SESSION['user_name']) ) {
 
   if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
@@ -28,5 +26,5 @@ if ( isset($_SESSION['user_name']) ) {
   }
 
 } else {
-  header( 'Location: http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER["SCRIPT_NAME"]) . '/login.php');
+  header( 'Location: http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER["SCRIPT_NAME"]) . '/index.php');
 }

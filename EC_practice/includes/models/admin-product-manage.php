@@ -37,6 +37,37 @@ class Product_Manage {
     include_once('includes/view/cart.php');
   }
 
+  public function purchase_comp_page_render ( $input, $messages = [] ) {
+    $db = $this->db;
+    $items = $db->get_user_selected_cart_items();
+    if ( count($items) === 0 ) {
+      $messages[] = 'カートの中身は空です。';
+    } else {
+      $this->purchase_comp( $items );
+    }
+
+    $items = entity_assoc_array( $items );
+    include_once('includes/view/purchase-comp.php');
+  }
+
+  private function purchase_comp ( $items ) {
+    $db = $this->db;
+    $items_count = count( $items );
+    $amount_num = 0;
+    $stock_num = 0;
+    $item_id = 0;
+    if ( isset($items) ) {
+      for ( $i = 0; $i < $items_count; $i++ ) {
+        $amount_num = (int)$items[$i]['amount_num'];
+        $item_id = (int)$items[$i]['item_id'];
+        $stock_num = $db->get_stock_num_item_id( $item_id );
+        $stock_num -= $amount_num;
+        $db->reduce_item_stock( $stock_num, $item_id );
+        $db->delete_selected_item( (int)$items[$i]['id'] );
+      }
+    }
+  }
+
   private function get_cart_total_price ( $items ) {
     $total = 0;
     $items_count = count($items);
@@ -119,7 +150,23 @@ class Product_Manage {
   }
   private function delete_selected_item ( $input ) {
     $db = $this->db;
-    return $db->delete_selected_item( $input );
+    return $db->delete_selected_item( (int)$input['selected-item-id'] );
+  }
+
+  public function action_update_selected_item_num ( $input ) {
+    return $this->update_selected_item_num( $input );
+  }
+  private function update_selected_item_num ( $input ) {
+    $db = $this->db;
+    $checker = $this->checker;
+    $err_msg = [];
+    if ( !$checker->check_positive_integer( $input['selected-item-num'] ) ) {
+      $err_msg[] = '1以上の半角数字でお願いします。';
+      return array( [], $err_msg );
+    } else {
+      list($success_msg, $err_msg) = $db->update_selected_item_num( $input );
+      return array( $success_msg, $err_msg );
+    }
   }
 
 }
