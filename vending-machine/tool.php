@@ -1,6 +1,7 @@
 <?php
 $err_msg = array();
 $success_msg = array();
+$msgs = array();
 $drink_data_list = array();
 $reverse = 0;
 $host = '';
@@ -93,9 +94,9 @@ if ( $link ) {
           }
         }
 
-        // if ( count($err_msg) === 0 ) {
-        //   $success_msg[] = 'ドリンクを追加しました';
-        // }
+        if ( count($err_msg) === 0 ) {
+          $success_msg[] = 'ドリンクを追加しました';
+        }
         break;
 
 
@@ -118,9 +119,9 @@ if ( $link ) {
           }
         }
 
-        // if ( count($err_msg) === 0 ) {
-        //   $success_msg[] = '在庫数を変更しました';
-        // }
+        if ( count($err_msg) === 0 ) {
+          $success_msg[] = '在庫数を変更しました';
+        }
         break;
 
 
@@ -134,19 +135,22 @@ if ( $link ) {
           $err_msg[] = "ステータスの変更ができませんでした。";
         }
 
-        // if ( count($err_msg) === 0 ) {
-        //   $success_msg[] = 'ステータスを変更しました';
-        // }
+        if ( count($err_msg) === 0 ) {
+          $success_msg[] = 'ステータスを変更しました';
+        }
         break;
     }
 
-    if (count($err_msg) === 0) {
-      mysqli_commit($link);
-      header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-      exit;
-    } else {
+    if ( count($err_msg) > 0 ) {
       mysqli_rollback($link);
+      $msgs = $err_msg;
+    } elseif ( count($success_msg) > 0 ) {
+      mysqli_commit( $link );
+      $msgs = $success_msg;
+    } else {
+      header( 'Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
     }
+
 
   }
 
@@ -184,10 +188,10 @@ if ( $link ) {
 
   <div class="administration-wrapper">
     <h1>管理ページ</h1>
-    <?php if ( count($err_msg) > 0 ) : ?>
+    <?php if ( count($msgs) > 0 ) : ?>
       <ul>
-        <?php foreach ( $err_msg as $err ) : ?>
-          <li><?php echo $err; ?></li>
+        <?php foreach ( $msgs as $msg ) : ?>
+          <li><?php echo $msg; ?></li>
         <?php endforeach; ?>
       </ul>
     <?php endif; ?>
@@ -204,7 +208,7 @@ if ( $link ) {
         <label for="stock-num">個数</label>：
         <input type="text" name="stock-num" value="" id="stock-num"><br>
 
-        <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="2097152" />
         <input type="file" name="drink-image"><br>
 
         <select name="status">
