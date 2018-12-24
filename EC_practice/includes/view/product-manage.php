@@ -7,9 +7,10 @@
 </head>
 <body>
 
-  <div class="admin-wrapper">
+  <div class="wrapper">
     <h1>商品管理ページ</h1>
-    <nav>
+
+    <nav class="global-nav">
       <ul>
         <li><a href="logout.php">ログアウト</a></li>
         <li><a href="admin-side-user.php">ユーザ管理ページ</a></li>
@@ -17,11 +18,13 @@
     </nav>
 
     <?php if ( count($messages) > 0 ) : ?>
-      <ul>
-        <?php foreach ( $messages as $message ) : ?>
-          <li><?php echo $message; ?></li>
-        <?php endforeach; ?>
-      </ul>
+      <div class="message-wrapper">
+        <ul>
+          <?php foreach ( $messages as $message ) : ?>
+            <li><?php echo $message; ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
     <?php endif; ?>
 
     <section class="addition">

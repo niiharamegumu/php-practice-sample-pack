@@ -6,26 +6,35 @@
     <link rel="stylesheet" href="./css/style.css">
   </head>
   <body>
-    <h1>ユーザー登録ページ</h1>
-    <?php if ( count($messages) > 0 ) : ?>
-      <ul>
-        <?php foreach ( $messages as $message ) : ?>
-          <li><?php echo $message; ?></li>
-        <?php endforeach; ?>
-      </ul>
-    <?php endif; ?>
+    <div class="wrapper">
+      <h1>ユーザー登録ページ</h1>
 
-    <form method="post" action="<?php echo $_SERVER['PHP_SELF']?>">
-      <div>
-        <label for="user-name">ユーザー名</label>：
-        <input type="text" name="user-name" value="" placeholder="ユーザー名"><br>
-        <label for="user-pw">パスワード</label>：
-        <input type="password" name="user-pw" value="" placeholder="パスワード">
-      </div>
-      <input type="submit" value="新規作成する">
-    </form>
-    <nav>
-      <a href="./login.php">ログインページに移動する</a>
-    </nav>
+      <nav class="global-nav">
+        <ul>
+          <li><a href="./index.php">ログインページに移動する</a></li>
+        </ul>
+      </nav>
+
+      <?php if ( count($messages) > 0 ) : ?>
+        <div class="message-wrapper">
+          <ul>
+            <?php foreach ( $messages as $message ) : ?>
+              <li><?php echo $message; ?></li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      <?php endif; ?>
+
+      <form method="post" action="<?php echo $_SERVER['PHP_SELF']?>">
+        <div>
+          <label for="register-name">ユーザー名</label>：
+          <input type="text" name="user-name" id="register-name" placeholder="ユーザー名" autofocus><br>
+          <label for="register-pw">パスワード</label>：
+          <input type="password" name="user-pw" id="register-pw" placeholder="パスワード">
+        </div>
+        <input type="submit" value="新規作成する">
+      </form>
+
+    </div>
   </body>
 </html>

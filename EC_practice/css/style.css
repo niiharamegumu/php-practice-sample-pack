@@ -2,42 +2,110 @@
 a {
   text-decoration: none;
 }
-img {
-  height: 100px;
-  width: 150px;
-}
-table {
-  border-collapse: collapse;
-  text-align: center;
-}
-.admin-user-wrapper table,
- .admin-wrapper table {
-  width: 900px;
-}
-tr,th,td {
-  border: 1px solid #aaa;
-  padding: 10px 0;
-}
-.admin-user-wrapper tr:nth-child(even),
-.product-info tbody tr:nth-child(odd) {
-  background-color: #eee;
-}
-.admin-user-wrapper table tr:first-child th {
-  width: 70%;
-}
-
-.admin-wrapper nav ul,
-.admin-user-wrapper nav ul {
-  border-bottom: 1px solid #ccc;
-  display: flex;
+ul {
   list-style: none;
   padding-left: 0;
 }
-.admin-wrapper nav ul li,
-.admin-user-wrapper nav ul li {
-  margin-right: 20px;
+.wrapper {
+  margin: 0 auto;
+  text-align: center;
+  width: 960px;
 }
-.admin-wrapper nav ul li a,
-.admin-user-wrapper nav ul li a {
+.wrapper h1,
+.wrapper h2 {
+  color: #666;
+  text-align: center;
+}
+.global-nav,
+.message-wrapper {
+  margin-bottom: 20px;
+}
+.global-nav ul {
+  display: flex;
+  justify-content: center;
+}
+.global-nav ul li {
+  width: 25%;
+}
+.global-nav ul li a {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  color: #000;
   display: block;
+  line-height: 40px;
+  height: 40px;
+}
+.global-nav ul li a:hover {
+  color: #fff;
+  font-weight: bold;
+  background-color: #d25448;
+}
+/* .cart-icon:hover {
+
+} */
+.message-wrapper ul {
+  margin: 0 auto;
+  width: 40%;
+}
+.message-wrapper ul li {
+  color: #d25448;
+  font-weight: bold;
+}
+input[type="submit"] {
+  background-color: #d25448;
+  border-style: none;
+  border-radius: 30px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 20px 0;
+  margin: 20px 0;
+  width: 100px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,td {
+  border: 1px solid #999;
+}
+img {
+  height: 100px;
+  vertical-align: bottom;
+  width: 150px;
+}
+table tbody tr:nth-child(odd) {
+  background-color: #ccc;
+}
+.product-list {
+  margin-top: 40px;
+}
+.product-list ul,
+.selected-items ul,
+.purchase-comp  ul {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.product-list ul li,
+.selected-items ul li,
+.purchase-comp  ul li {
+  background-color: #ccc;
+  border: 1px double #fff;
+  padding-top: 20px;
+  width: 30%;
+}
+.selected-items ul input[type="submit"] {
+  font-size: 12px;
+  padding: 4px 0;
+  width: 80px;
+}
+.total-fee {
+  border-bottom: 4px solid #ccc;
+  font-size: 50px;
+}
+.total-fee span {
+  color: #e5043c;
+  font-weight: bold;
 }
