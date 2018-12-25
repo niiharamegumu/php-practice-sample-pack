@@ -19,7 +19,7 @@ function get_post_value ( $name ) {
 
 function check_have_characters ( $name ) {
   $err = '';
-  if ( !isset( $_POST[$name] ) || mb_strlen( $_POST[$name] ) === 0 ) {
+  if ( !isset( $_POST[$name] ) || preg_match("/^(\s|　)+$/", $_POST[$name]) ) {
     $err = strtoupper( $name ) . 'が空です。';
     return $err;
   } else {

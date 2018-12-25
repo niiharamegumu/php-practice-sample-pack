@@ -71,7 +71,7 @@ function get_post_value ( $name ) {
 
 function check_input_value ( $type, $max ) {
   $error = '';
-  if ( !isset( $_POST[$type] ) || mb_strlen( $_POST[$type] ) === 0 ) {
+  if ( !isset( $_POST[$type] ) || preg_match("/^(\s|　)+$/", $_POST[$type]) ) {
     $error = strtoupper($type) . 'を入力してください。';
     return $error;
   } elseif ( mb_strlen( $_POST[$type] ) > $max ) {
