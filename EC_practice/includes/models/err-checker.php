@@ -5,17 +5,17 @@ class Err_Checker {
 
   public function check_insert_options_item () {
     $err_msg = $this->err_msg;
-    if ( !isset($_POST['item-name']) || mb_strlen( $_POST['item-name'] ) === 0 ) {
+    if ( !isset($_POST['item-name']) || preg_match("/^(\s|　)+$/", $_POST['item-name']) ) {
       $err_msg[] = '商品の名前を入力してください。';
     }
 
-    if ( !isset($_POST['item-price']) || mb_strlen( $_POST['item-price'] ) === 0 ) {
+    if ( !isset($_POST['item-price']) || preg_match("/^(\s|　)+$/", $_POST['item-price']) ) {
       $err_msg[] = '商品の値段を入力してください。';
     } elseif ( !$this->check_int_zero_over( $_POST['item-price'] ) ) {
       $err_msg[] = '商品の値段は、0以上の半角数字です。';
     }
 
-    if (!isset($_POST['stock-num']) || mb_strlen( $_POST['stock-num'] ) === 0) {
+    if (!isset($_POST['stock-num']) || preg_match("/^(\s|　)+$/", $_POST['stock-num']) ) {
       $err_msg[] = '商品の個数を入力してください。';
     } elseif ( !$this->check_int_zero_over( $_POST['stock-num'] ) ) {
       $err_msg[] = '商品の個数は、0以上の半角数字です。';
