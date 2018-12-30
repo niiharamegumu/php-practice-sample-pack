@@ -8,7 +8,7 @@ $comment_max = 100;
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
   $name = null;
   $comment = null;
-  if ( !isset($_POST['name']) || preg_match("/^(\s|　)+$/", $_POST['name']) ) {
+  if ( !isset($_POST['name']) || preg_match("/^(\s|　)+$/", $_POST['name']) || mb_strlen($_POST['name']) === 0 ) {
     $errors['name_error'] = '名前を入力してください';
   } elseif ( mb_strlen($_POST['name']) > $name_max ) {
     $errors['name_error'] = '名前は20文字以内で入力してください';
@@ -16,7 +16,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8');
   }
 
-  if ( !isset($_POST['comment']) || preg_match("/^(\s|　)+$/", $_POST['comment']) ) {
+  if ( !isset($_POST['comment']) || preg_match("/^(\s|　)+$/", $_POST['comment']) || mb_strlen($_POST['comment']) === 0 ) {
     $errors['comment_error'] = 'コメントを入力してください';
   } elseif ( mb_strlen($_POST['comment']) > $comment_max ) {
     $errors['comment_error'] = 'コメントは100文字以内で入力してください';

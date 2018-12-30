@@ -21,7 +21,7 @@ if ( $link ) {
   if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     mysqli_autocommit($link, false);
 
-    if ( !isset( $_POST['input-amount'] ) || mb_strlen( $_POST['input-amount'] ) === 0 ) {
+    if ( !isset( $_POST['input-amount'] ) || preg_match("/^(\s|　)+$/", $_POST['input-amount']) || mb_strlen( $_POST['input-amount'] ) === 0 ) {
       $err_msg[] = '投入金額が空です。';
     } elseif ( !preg_match( '/^[0-9]+$/', $_POST['input-amount'] ) ) {
       $err_msg[] = '投入金額は、0以上の整数でお願いします。';

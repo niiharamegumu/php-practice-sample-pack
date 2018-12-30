@@ -27,13 +27,13 @@ if ( $link ) {
         $stock_num = Null;
         $status = Null;
 
-        if ( !isset( $_POST['drink-name'] ) || preg_match("/^(\s|　)+$/", $_POST['drink-name']) ) {
+        if ( !isset( $_POST['drink-name'] ) || preg_match("/^(\s|　)+$/", $_POST['drink-name']) || mb_strlen($_POST['drink-name']) === 0 ) {
           $err_msg[] = '名前が空です。';
         } else {
           $drink_name = $_POST['drink-name'];
         }
 
-        if ( !isset( $_POST['drink-price'] ) || preg_match("/^(\s|　)+$/", $_POST['drink-price']) ) {
+        if ( !isset( $_POST['drink-price'] ) || preg_match("/^(\s|　)+$/", $_POST['drink-price']) || mb_strlen($_POST['drink-price']) === 0 ) {
           $err_msg[] = '値段が空です。';
         } elseif ( !preg_match('/^[0-9]+$/', $_POST['drink-price'] ) ) {
           $err_msg[] = '値段は、0以上の整数でお願いします。';
@@ -41,7 +41,7 @@ if ( $link ) {
           $drink_price = $_POST['drink-price'];
         }
 
-        if ( !isset( $_POST['stock-num'] ) || preg_match("/^(\s|　)+$/", $_POST['stock-num']) ) {
+        if ( !isset( $_POST['stock-num'] ) || preg_match("/^(\s|　)+$/", $_POST['stock-num']) || mb_strlen($_POST['stock-num']) === 0 ) {
           $err_msg[] = '個数が空です。';
         } elseif ( !preg_match('/^[0-9]+$/', $_POST['stock-num'] ) ) {
           $err_msg[] = '個数は、0以上の整数でお願いします。';
